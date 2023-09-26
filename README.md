@@ -1,3 +1,19 @@
+# Superset EF
+
+This is a repository of a extended version of [Apache Superset](https://github.com/apache/superset).
+
+EF version of Superset is by extended version that applies some additional features or applies bug fixes to official functionalities.
+
+## Extension Changelog
+
+### 2023-09-26
+
+- Apply fix chart table for full table export (`csv/excel``) - https://github.com/apache/superset/pull/23554
+
+---
+# Official documentation below
+---
+
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
