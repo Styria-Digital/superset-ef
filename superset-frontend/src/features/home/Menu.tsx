@@ -174,8 +174,12 @@ export function Menu({
   const uiConfig = useUiConfig();
   const theme = useTheme();
 
-  // Set fetched available language in uiConfig for a re-use
+  /**
+   * Set fetched available language in uiConfig for a re-use
+   * set locale to currentLocale for a re-use
+   */
   if (navbarRight.languages) {
+    uiConfig.currentLocale = navbarRight.locale;
     uiConfig.availableLanguages = navbarRight.languages;
   }
 
