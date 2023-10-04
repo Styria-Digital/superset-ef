@@ -26,6 +26,7 @@ interface UiConfigType {
   hideNav: boolean;
   hideChartControls: boolean;
   availableLanguages?: object;
+  currentLocale?: string;
 }
 interface EmbeddedUiConfigProviderProps {
   children: JSX.Element;
