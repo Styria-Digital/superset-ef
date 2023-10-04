@@ -174,6 +174,11 @@ export function Menu({
   const uiConfig = useUiConfig();
   const theme = useTheme();
 
+  // Set fetched available language in uiConfig for a re-use
+  if (navbarRight.languages) {
+    uiConfig.availableLanguages = navbarRight.languages;
+  }
+
   useEffect(() => {
     function handleResize() {
       if (window.innerWidth <= 767) {
