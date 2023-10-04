@@ -42,6 +42,7 @@ const DEFAULT_LANGUAGE_PACK: LanguagePack = {
   },
 };
 
+// TODO: load token and secret from config
 tx.init({
   token: '1/706c5adf0f9eb8d1b722086ce45695a7498e82a4',
   secret: '1/23a2ff735d117ba00ef2360eabdbcdbe993ff021',
