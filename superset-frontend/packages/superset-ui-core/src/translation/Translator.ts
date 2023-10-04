@@ -58,8 +58,7 @@ export default class Translator {
 
     if (languagePack === null) {
       languagePack = DEFAULT_LANGUAGE_PACK;
-    } else {
-      console.warn('[Translations] no language pack found for selcetd language, falling back to default one!')
+      console.warn('[Translations] no language pack found for selceted language, falling back to default one!')
     }
 
     this.i18n = new UntypedJed(languagePack) as Jed;
