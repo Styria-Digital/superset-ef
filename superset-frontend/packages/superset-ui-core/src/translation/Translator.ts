@@ -17,6 +17,8 @@
  * under the License.
  */
 import UntypedJed from 'jed';
+import { tx, t as transifexTranslate } from '@transifex/native';
+
 import logging from '../utils/logging';
 import {
   Jed,
@@ -40,15 +42,32 @@ const DEFAULT_LANGUAGE_PACK: LanguagePack = {
   },
 };
 
+tx.init({
+  token: '1/706c5adf0f9eb8d1b722086ce45695a7498e82a4',
+  secret: '1/23a2ff735d117ba00ef2360eabdbcdbe993ff021',
+});
+
 export default class Translator {
   i18n: Jed;
 
   locale: Locale;
 
   constructor(config: TranslatorConfig = {}) {
-    const { languagePack = DEFAULT_LANGUAGE_PACK } = config;
+    let { languagePack = DEFAULT_LANGUAGE_PACK } = config;
+
+    if (languagePack === null) {
+      languagePack = DEFAULT_LANGUAGE_PACK;
+    } else {
+      console.warn('[Translations] no language pack found for selcetd language, falling back to default one!')
+    }
+
     this.i18n = new UntypedJed(languagePack) as Jed;
     this.locale = this.i18n.options.locale_data.superset[''].lang as Locale;
+
+    tx.setCurrentLocale(this.locale).then(() => {
+        console.info(`[Transifex] Language ('${this.locale}') content loaded.`);
+      })
+      .catch(error => console.error(`[Transifex] ${error}`));
   }
 
   /**
@@ -86,7 +105,13 @@ export default class Translator {
   }
 
   translate(input: string, ...args: unknown[]): string {
-    return this.i18n.translate(input).fetch(...args);
+    let translated = transifexTranslate(input);
+
+    if (input === translated) {
+      translated = this.i18n.translate(input).fetch(...args);
+    }
+
+    return translated;
   }
 
   translateWithNumber(key: string, ...args: unknown[]): string {

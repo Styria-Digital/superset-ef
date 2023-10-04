@@ -354,6 +354,7 @@ LANGUAGES = {
     "es": {"flag": "es", "name": "Spanish"},
     "it": {"flag": "it", "name": "Italian"},
     "fr": {"flag": "fr", "name": "French"},
+    "hr": {"flag": "hr", "name": "Croatian"},
     "zh": {"flag": "cn", "name": "Chinese"},
     "ja": {"flag": "jp", "name": "Japanese"},
     "de": {"flag": "de", "name": "German"},
@@ -367,7 +368,11 @@ LANGUAGES = {
 }
 # Turning off i18n by default as translation in most languages are
 # incomplete and not well maintained.
-LANGUAGES = {}
+LANGUAGES = {
+    "en": {"flag": "us", "name": "English"},
+    "hr": {"flag": "hr", "name": "Croatian"},
+    "de": {"flag": "de", "name": "German"},
+}
 
 
 # Override the default d3 locale format
@@ -1414,6 +1419,11 @@ CONTENT_SECURITY_POLICY_WARNING = True
 # Do you want Talisman enabled?
 TALISMAN_ENABLED = utils.cast_to_boolean(os.environ.get("TALISMAN_ENABLED", True))
 
+TRANSIFEX_SOURCES = [
+    "https://cds.svc.transifex.net",
+    "https://cds.static.transifex.net",
+]
+
 # If you want Talisman, how do you want it configured??
 TALISMAN_CONFIG = {
     "content_security_policy": {
@@ -1423,8 +1433,8 @@ TALISMAN_CONFIG = {
         "connect-src": [
             "'self'",
             "https://api.mapbox.com",
-            "https://events.mapbox.com",
-        ],
+            "https://events.mapbox.com"
+        ] + TRANSIFEX_SOURCES,
         "object-src": "'none'",
         "style-src": ["'self'", "'unsafe-inline'"],
         "script-src": ["'self'", "'strict-dynamic'"],
@@ -1442,7 +1452,7 @@ TALISMAN_DEV_CONFIG = {
             "'self'",
             "https://api.mapbox.com",
             "https://events.mapbox.com",
-        ],
+        ] + TRANSIFEX_SOURCES,
         "object-src": "'none'",
         "style-src": ["'self'", "'unsafe-inline'"],
         "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
