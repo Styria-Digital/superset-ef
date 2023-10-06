@@ -379,6 +379,7 @@ def menu_data(user: User) -> dict[str, Any]:
             if user.is_anonymous or is_feature_enabled("MENU_HIDE_USER_INFO")
             else "/profile/",
             "locale": session.get("locale", "en"),
+            "default_locale": appbuilder.app.config["BABEL_DEFAULT_LOCALE"],
         },
     }
 
