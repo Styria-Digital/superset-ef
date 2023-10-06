@@ -179,6 +179,7 @@ export function Menu({
    * set locale to currentLocale for a re-use
    */
   if (navbarRight.languages) {
+    uiConfig.defaultLocale = navbarRight.default_locale;
     uiConfig.currentLocale = navbarRight.locale;
     uiConfig.availableLanguages = navbarRight.languages;
   }

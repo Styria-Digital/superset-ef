@@ -93,6 +93,7 @@ export interface BrandProps {
 }
 
 export interface NavBarProps {
+  default_locale: string;
   show_watermark: boolean;
   bug_report_url?: string;
   bug_report_text?: string;
