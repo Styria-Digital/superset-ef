@@ -26,9 +26,3 @@ export const FAST_DEBOUNCE = 250;
  * Slower debounce delay for inputs with expensive API calls.
  */
 export const SLOW_DEBOUNCE = 500;
-
-
-/**
- * More slower debounce delay for inputs with 3rd party API calls.
- */
-export const SLOWER_DEBOUNCE = 1000;

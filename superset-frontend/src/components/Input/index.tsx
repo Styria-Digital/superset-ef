@@ -16,18 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useState } from 'react';
-import { SLOWER_DEBOUNCE } from '@superset-ui/core';
-import { debounce } from 'lodash';
+import React, { forwardRef, useImperativeHandle } from 'react';
 
 import { useUiConfig } from 'src/components/UiConfigContext';
 
 import { styled } from '@superset-ui/core';
 import { Input as AntdInput, InputNumber as AntdInputNumber } from 'antd';
 
-// TODO: Remove this?
-// import { MainNav as Menu } from 'src/components/Menu';
-// import LanguagePicker from 'src/features/home/LanguagePicker';
+import { tx } from '@transifex/native';
 import { AntdForm } from 'src/components';
 
 export const Input = styled(AntdInput)`
@@ -57,22 +53,36 @@ interface Props {
   translatePrefix?: string;
 }
 
-export const TextAreaTranslatable: React.FC<Props> = ({
-  name,
-  label,
-  rows = 3,
-  value = '',
-  translatePrefix,
-  ...props
-}) => {
+export const TextAreaTranslatable = forwardRef((props: Props, ref) => {
   const uiConfig = useUiConfig();
+  const { name, label, rows, value, translatePrefix } = props;
 
-  // TODO remove this?
-  // const [shownLangField, setShownLangField] = useState<string>(uiConfig.currentLocale);
+  const getTranslationKey = (fieldName: string) =>
+    `${translatePrefix}_${fieldName}`;
 
-  // const showTranslation = (mainFieldName: string, langKey: string) => {
-  //   setShownLangField(langKey);
-  // };
+  useImperativeHandle(
+    ref,
+    () => ({
+      async onFormSaved(payload: object) {
+        const submittedValue = payload[name];
+
+        if (submittedValue !== value) {
+          const fieldKey = getTranslationKey(name);
+          const translationData = {};
+
+          translationData[fieldKey] = {
+            string: submittedValue,
+            meta: {
+              context: translatePrefix,
+            },
+          };
+
+          await tx.pushSource(translationData);
+        }
+      },
+    }),
+    [],
+  );
 
   const otherLanguages = Object.fromEntries(
     Object.entries(uiConfig.availableLanguages || {}).filter(
@@ -80,24 +90,8 @@ export const TextAreaTranslatable: React.FC<Props> = ({
     ),
   );
 
-  const onKeyUpTranslateField = debounce(
-    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      console.log(event.target.value);
-    },
-    SLOWER_DEBOUNCE,
-  );
-
   return (
     <div>
-      {/* TODO remove this? */}
-      {/* <Menu mode="horizontal">
-        <LanguagePicker
-          locale={uiConfig.currentLocale}
-          languages={uiConfig.availableLanguages}
-          mainFieldName="description"
-          callback={showTranslation}
-        />
-      </Menu> */}
       <StyledFormItem label={label} name={name}>
         <TextArea
           rows={rows}
@@ -108,7 +102,6 @@ export const TextAreaTranslatable: React.FC<Props> = ({
         />
       </StyledFormItem>
       <div style={{ padding: '8px 0px' }}>Translations</div>
-      {/* TODO: implement send to Transifex upon save/change */}
       {uiConfig.availableLanguages &&
         Object.entries(otherLanguages).map(([lang, config]) => (
           <div
@@ -128,14 +121,12 @@ export const TextAreaTranslatable: React.FC<Props> = ({
             <TextArea
               rows={rows}
               style={{ maxWidth: '100%' }}
+              data-language={lang}
+              data-field-name={name}
               name={`${name}_${lang}`}
-              onChange={event => {
-                event.persist();
-                onKeyUpTranslateField(event);
-              }}
             />
           </div>
         ))}
     </div>
   );
-};
+});
