@@ -17,6 +17,7 @@
  * under the License.
  */
 import React, { useState } from 'react';
+import { debounce } from 'lodash';
 
 import { useUiConfig } from 'src/components/UiConfigContext';
 
@@ -52,6 +53,7 @@ interface Props {
   label: string;
   rows?: number;
   value?: string;
+  translatePrefix?: string;
 }
 
 export const TextAreaTranslatable: React.FC<Props> = ({
@@ -59,6 +61,7 @@ export const TextAreaTranslatable: React.FC<Props> = ({
   label,
   rows = 3,
   value = '',
+  translatePrefix,
   ...props
 }) => {
   const uiConfig = useUiConfig();
@@ -74,6 +77,13 @@ export const TextAreaTranslatable: React.FC<Props> = ({
     Object.entries(uiConfig.availableLanguages || {}).filter(
       ([key]) => key !== uiConfig.defaultLocale,
     ),
+  );
+
+  const onKeyUpTranslateField = debounce(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      console.log(event.target.value);
+    },
+    1000
   );
 
   return (
@@ -118,6 +128,10 @@ export const TextAreaTranslatable: React.FC<Props> = ({
               rows={rows}
               style={{ maxWidth: '100%' }}
               name={`${name}_${lang}`}
+              onChange={event => {
+                event.persist();
+                onKeyUpTranslateField(event);
+              }}
             />
           </div>
         ))}
