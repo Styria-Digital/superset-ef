@@ -58,13 +58,16 @@ export default class Translator {
 
     if (languagePack === null) {
       languagePack = DEFAULT_LANGUAGE_PACK;
-      console.warn('[Translations] no language pack found for selceted language, falling back to default one!')
+      console.warn(
+        '[Translations] no language pack found for selceted language, falling back to default one!',
+      );
     }
 
     this.i18n = new UntypedJed(languagePack) as Jed;
     this.locale = this.i18n.options.locale_data.superset[''].lang as Locale;
 
-    tx.setCurrentLocale(this.locale).then(() => {
+    tx.setCurrentLocale(this.locale)
+      .then(() => {
         console.info(`[Transifex] Language ('${this.locale}') content loaded.`);
       })
       .catch(error => console.error(`[Transifex] ${error}`));
