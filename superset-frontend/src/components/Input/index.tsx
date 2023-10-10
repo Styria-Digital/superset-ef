@@ -17,6 +17,7 @@
  * under the License.
  */
 import React, { useState } from 'react';
+import { SLOWER_DEBOUNCE } from '@superset-ui/core';
 import { debounce } from 'lodash';
 
 import { useUiConfig } from 'src/components/UiConfigContext';
@@ -83,7 +84,7 @@ export const TextAreaTranslatable: React.FC<Props> = ({
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       console.log(event.target.value);
     },
-    1000
+    SLOWER_DEBOUNCE,
   );
 
   return (
