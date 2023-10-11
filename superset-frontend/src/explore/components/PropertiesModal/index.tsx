@@ -16,9 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import React, {
+  useMemo,
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 import Modal from 'src/components/Modal';
-import { Input, TextArea, TextAreaTranslatable } from 'src/components/Input';
+import { Input, TextAreaTranslatable } from 'src/components/Input';
 import Button from 'src/components/Button';
 import { AsyncSelect, Row, Col, AntdForm } from 'src/components';
 import { SelectValue } from 'antd/lib/select';
@@ -41,8 +47,6 @@ import {
   OBJECT_TYPES,
 } from 'src/features/tags/tags';
 import TagType from 'src/types/TagType';
-
-import { T } from '@transifex/react';
 
 export type PropertiesModalProps = {
   slice: Slice;
@@ -247,6 +251,7 @@ function PropertiesModal({
       };
       onSave(updatedChart);
 
+      // Used in translatable field(s)
       if (formRef.current != null) {
         (formRef.current as any).onFormSaved(payload);
       }
@@ -380,11 +385,9 @@ function PropertiesModal({
                 translatePrefix={`${slice.slice_id}`}
                 ref={formRef}
               />
-              ovo je description: {slice.description} {t('Hello world')}
-              <T _str="banana" />
               <StyledHelpBlock className="help-block">
                 {t(
-                  'The description can be displayed as widget headers in the dashboard view. Supports markdown.',
+                  'The description can be displayed as widget headers in the dashboard view.',
                 )}
               </StyledHelpBlock>
             </FormItem>
