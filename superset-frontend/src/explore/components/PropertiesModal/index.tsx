@@ -24,7 +24,7 @@ import React, {
   useRef,
 } from 'react';
 import Modal from 'src/components/Modal';
-import { Input, TextAreaTranslatable } from 'src/components/Input';
+import { Input, TranslatableField } from 'src/components/Input';
 import Button from 'src/components/Button';
 import { AsyncSelect, Row, Col, AntdForm } from 'src/components';
 import { SelectValue } from 'antd/lib/select';
@@ -378,7 +378,8 @@ function PropertiesModal({
               />
             </FormItem>
             <FormItem>
-              <TextAreaTranslatable
+              <TranslatableField
+                fieldType="textarea"
                 label={t('Description')}
                 name="description"
                 value={slice.description || ''}

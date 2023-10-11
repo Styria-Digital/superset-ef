@@ -63,6 +63,7 @@ const translationPreviewStyle = {
 };
 
 interface Props {
+  fieldType: string;
   name: string;
   label: string;
   translatePrefix: string;
@@ -70,9 +71,19 @@ interface Props {
   value?: string;
 }
 
-export const TextAreaTranslatable = forwardRef((props: Props, ref) => {
-  const { name, label, rows, value, translatePrefix } = props;
+export const TranslatableField = forwardRef((props: Props, ref) => {
+  const { fieldType, name, label, translatePrefix } = props;
+  let { rows, value } = props;
+
   const [prefix, setPrefix] = useState(translatePrefix);
+
+  const FieldMap = {
+    input: Input,
+    textarea: TextArea,
+  };
+  const FieldComponent = FieldMap[fieldType];
+
+  rows = fieldType === 'textarea' ? rows || 4 : 0;
 
   const getTranslationKey = (fieldName: string) =>
     `${translatePrefix}_${fieldName}`;
@@ -104,7 +115,7 @@ export const TextAreaTranslatable = forwardRef((props: Props, ref) => {
   return (
     <div>
       <StyledFormItem label={label} name={name}>
-        <TextArea
+        <FieldComponent
           rows={rows}
           style={{ maxWidth: '100%' }}
           name={name}
@@ -118,6 +129,10 @@ export const TextAreaTranslatable = forwardRef((props: Props, ref) => {
         style={{ display: 'flex', marginBottom: '1rem' }}
       >
         <StyledFormItem label={t('Translation key prefix')} required>
+          {/* TODO: Enabled edit of value? If so, 
+            store prefix somewhere to db so it can be retrieved for 
+            a display of slice 
+          */}
           <Input
             aria-label={t('Translation key prefix')}
             name="transifex-key-prefix"
@@ -127,9 +142,10 @@ export const TextAreaTranslatable = forwardRef((props: Props, ref) => {
               setPrefix(event.target.value);
             }}
           />
-          <StyledHelpBlock className="help-block">
+          {/* TODO: If edit enabled, uncomment this */}
+          {/* <StyledHelpBlock className="help-block">
             {`Default: ${translatePrefix}`}
-          </StyledHelpBlock>
+          </StyledHelpBlock> */}
         </StyledFormItem>
         <div style={{ marginLeft: '2rem', padding: '2.5rem 0 0' }}>
           <LanguagePicker />
