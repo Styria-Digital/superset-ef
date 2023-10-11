@@ -53,6 +53,8 @@ export default class Translator {
 
   locale: Locale;
 
+  transifexLoaded: boolean;
+
   constructor(config: TranslatorConfig = {}) {
     let { languagePack = DEFAULT_LANGUAGE_PACK } = config;
 
@@ -65,10 +67,13 @@ export default class Translator {
 
     this.i18n = new UntypedJed(languagePack) as Jed;
     this.locale = this.i18n.options.locale_data.superset[''].lang as Locale;
+    this.transifexLoaded = false;
 
     tx.setCurrentLocale(this.locale)
       .then(() => {
         console.info(`[Transifex] Language ('${this.locale}') content loaded.`);
+
+        this.transifexLoaded = true;
       })
       .catch(error => console.error(`[Transifex] ${error}`));
   }
@@ -108,9 +113,19 @@ export default class Translator {
   }
 
   translate(input: string, ...args: unknown[]): string {
-    let translated = transifexTranslate(input);
+    let translated = input;
 
-    if (input === translated) {
+    if (this.transifexLoaded) {
+      let transifexMeta = {};
+
+      if (args[0] && typeof args[0] === 'object') {
+        transifexMeta = args[0];
+      }
+
+      translated = transifexTranslate(input, transifexMeta);
+    }
+
+    if (this.transifexLoaded === false || input === translated) {
       translated = this.i18n.translate(input).fetch(...args);
     }
 
