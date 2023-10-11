@@ -199,7 +199,7 @@ export const ExploreChartHeader = ({
     if (slice?.description) {
       items.push({
         type: MetadataType.DESCRIPTION,
-        value: slice?.description,
+        value: t(slice.description, { _key: `${slice.slice_id}_description` }),
       });
     }
     return <MetadataBar items={items} tooltipPlacement="bottom" />;
