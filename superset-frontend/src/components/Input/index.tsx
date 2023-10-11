@@ -69,11 +69,25 @@ interface Props {
   translatePrefix: string;
   rows?: number;
   value?: string;
+  required?: boolean;
+  onChange?: Function;
+  payloadName?: string;
 }
 
 export const TranslatableField = forwardRef((props: Props, ref) => {
-  const { fieldType, name, label, translatePrefix } = props;
-  let { rows, value } = props;
+  const {
+    fieldType,
+    value,
+    name,
+    required,
+    label,
+    translatePrefix,
+    onChange,
+    payloadName,
+  } = props;
+  let { rows } = props;
+
+  rows = fieldType === 'textarea' ? rows || 4 : 0;
 
   const [prefix, setPrefix] = useState(translatePrefix);
 
@@ -83,8 +97,6 @@ export const TranslatableField = forwardRef((props: Props, ref) => {
   };
   const FieldComponent = FieldMap[fieldType];
 
-  rows = fieldType === 'textarea' ? rows || 4 : 0;
-
   const getTranslationKey = (fieldName: string) =>
     `${translatePrefix}_${fieldName}`;
 
@@ -92,7 +104,7 @@ export const TranslatableField = forwardRef((props: Props, ref) => {
     ref,
     () => ({
       async onFormSaved(payload: object) {
-        const submittedValue = payload[name];
+        const submittedValue = payload[payloadName || name];
 
         if (submittedValue !== value) {
           const fieldKey = getTranslationKey(name);
@@ -114,13 +126,15 @@ export const TranslatableField = forwardRef((props: Props, ref) => {
 
   return (
     <div>
-      <StyledFormItem label={label} name={name}>
+      <StyledFormItem label={label} name={name} required={required}>
         <FieldComponent
           rows={rows}
           style={{ maxWidth: '100%' }}
           name={name}
           id={name}
           defaultValue={value}
+          required={required}
+          onChange={onChange}
         />
       </StyledFormItem>
       <div style={{ padding: '8px 0px' }}>Translations</div>
