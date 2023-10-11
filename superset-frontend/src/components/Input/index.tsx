@@ -16,14 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { forwardRef, useImperativeHandle } from 'react';
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
 
-import { useUiConfig } from 'src/components/UiConfigContext';
-
-import { styled } from '@superset-ui/core';
+import { styled, t } from '@superset-ui/core';
 import { Input as AntdInput, InputNumber as AntdInputNumber } from 'antd';
 
 import { tx } from '@transifex/native';
+import { T, LanguagePicker } from '@transifex/react';
 import { AntdForm } from 'src/components';
 
 export const Input = styled(AntdInput)`
@@ -45,17 +44,35 @@ const StyledFormItem = styled(AntdForm.Item)`
   margin-bottom: 0;
 `;
 
+const StyledHelpBlock = styled.span`
+  margin-bottom: 0;
+`;
+
+const translationPreviewStyle = {
+  display: 'inline-block',
+  // eslint-disable-next-line theme-colors/no-literal-colors
+  backgroundColor: '#F0F0F0',
+  padding: '8px',
+  borderRadius: '4px',
+  textAlign: 'center',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  width: '100%',
+  minHeight: '38px',
+};
+
 interface Props {
   name: string;
   label: string;
+  translatePrefix: string;
   rows?: number;
   value?: string;
-  translatePrefix?: string;
 }
 
 export const TextAreaTranslatable = forwardRef((props: Props, ref) => {
-  const uiConfig = useUiConfig();
   const { name, label, rows, value, translatePrefix } = props;
+  const [prefix, setPrefix] = useState(translatePrefix);
 
   const getTranslationKey = (fieldName: string) =>
     `${translatePrefix}_${fieldName}`;
@@ -73,7 +90,7 @@ export const TextAreaTranslatable = forwardRef((props: Props, ref) => {
           translationData[fieldKey] = {
             string: submittedValue,
             meta: {
-              context: translatePrefix,
+              context: prefix,
             },
           };
 
@@ -82,12 +99,6 @@ export const TextAreaTranslatable = forwardRef((props: Props, ref) => {
       },
     }),
     [],
-  );
-
-  const otherLanguages = Object.fromEntries(
-    Object.entries(uiConfig.availableLanguages || {}).filter(
-      ([key]) => key !== uiConfig.defaultLocale,
-    ),
   );
 
   return (
@@ -102,31 +113,32 @@ export const TextAreaTranslatable = forwardRef((props: Props, ref) => {
         />
       </StyledFormItem>
       <div style={{ padding: '8px 0px' }}>Translations</div>
-      {uiConfig.availableLanguages &&
-        Object.entries(otherLanguages).map(([lang, config]) => (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              paddingBottom: '10px',
+      <div
+        className="translation_fields_wrap"
+        style={{ display: 'flex', marginBottom: '1rem' }}
+      >
+        <StyledFormItem label={t('Translation key prefix')} required>
+          <Input
+            aria-label={t('Translation key prefix')}
+            name="transifex-key-prefix"
+            type="text"
+            value={translatePrefix}
+            onChange={event => {
+              setPrefix(event.target.value);
             }}
-          >
-            <span className="f16">
-              <i
-                className={`flag ${config.flag}`}
-                style={{ marginRight: '5px' }}
-              />
-              {config.name}
-            </span>
-            <TextArea
-              rows={rows}
-              style={{ maxWidth: '100%' }}
-              data-language={lang}
-              data-field-name={name}
-              name={`${name}_${lang}`}
-            />
-          </div>
-        ))}
+          />
+          <StyledHelpBlock className="help-block">
+            {`Default: ${translatePrefix}`}
+          </StyledHelpBlock>
+        </StyledFormItem>
+        <div style={{ marginLeft: '2rem', padding: '2.5rem 0 0' }}>
+          <LanguagePicker />
+        </div>
+      </div>
+      <div style={{ padding: '0 0 8px' }}>{t('Preview')}</div>
+      <div className="translation_preview" style={translationPreviewStyle}>
+        <T _key={getTranslationKey(name)} />
+      </div>
     </div>
   );
 });
