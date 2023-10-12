@@ -134,10 +134,18 @@ export const PageHeaderWithActions = ({
   tooltipProps,
 }: PageHeaderWithActionsProps) => {
   const theme = useTheme();
+
+  const urlParams = new URLSearchParams(document.location.search);
+  const sliceId = urlParams.get('slice_id');
+  const sliceNameTranslated = t(editableTitleProps.title, {
+    _key: `${sliceId}_name`,
+  });
+
   return (
     <div css={headerStyles} className="header-with-actions">
       <div className="title-panel">
         <DynamicEditableTitle {...editableTitleProps} />
+        {` - (${sliceNameTranslated})`}
         {showTitlePanelItems && (
           <div css={buttonsStyles}>
             {certificatiedBadgeProps?.certifiedBy && (

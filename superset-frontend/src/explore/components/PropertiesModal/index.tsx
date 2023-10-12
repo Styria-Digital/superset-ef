@@ -185,7 +185,8 @@ function PropertiesModal({
     });
   };
 
-  const formRef = useRef(null);
+  const nameRef = useRef(null);
+  const descriptionRef = useRef(null);
 
   const onSubmit = async (values: {
     certified_by?: string;
@@ -252,8 +253,11 @@ function PropertiesModal({
       onSave(updatedChart);
 
       // Used in translatable field(s)
-      if (formRef.current != null) {
-        (formRef.current as any).onFormSaved(payload);
+      if (nameRef.current != null) {
+        (nameRef.current as any).onFormSaved(payload);
+      }
+      if (descriptionRef.current != null) {
+        (descriptionRef.current as any).onFormSaved(payload);
       }
 
       addSuccessToast(t('Chart properties updated'));
@@ -365,13 +369,16 @@ function PropertiesModal({
         <Row gutter={16}>
           <Col xs={24} md={12}>
             <h3>{t('Basic information')}</h3>
-            <FormItem label={t('Name')} required>
-              <Input
-                aria-label={t('Name')}
+            <FormItem>
+              <TranslatableField
+                fieldType="input"
+                label={t('Name')}
                 name="name"
-                data-test="properties-modal-name-input"
-                type="text"
+                payloadName="slice_name"
                 value={name}
+                required
+                translatePrefix={`${slice.slice_id}`}
+                ref={nameRef}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                   setName(event.target.value ?? '')
                 }
@@ -384,7 +391,7 @@ function PropertiesModal({
                 name="description"
                 value={slice.description || ''}
                 translatePrefix={`${slice.slice_id}`}
-                ref={formRef}
+                ref={descriptionRef}
               />
               <StyledHelpBlock className="help-block">
                 {t(
