@@ -17,7 +17,7 @@
  * under the License.
  */
 import React from 'react';
-import { styled, useTheme } from '@superset-ui/core';
+import { styled, useTheme, t } from '@superset-ui/core';
 import { Skeleton, AntdCard } from 'src/components';
 import { Tooltip } from 'src/components/Tooltip';
 import ImageLoader, { BackgroundPosition } from './ImageLoader';
@@ -187,6 +187,21 @@ function ListViewCard({
 }: CardProps) {
   const Link = url && linkComponent ? linkComponent : AnchorLink;
   const theme = useTheme();
+
+  let displayTitle = title;
+
+  if (url && title) {
+    const regex = /slice_id=(\d+)/gm;
+    const matches = regex.exec(url);
+    const sliceId = matches?.[1] ? matches[1] : null;
+
+    displayTitle = sliceId
+      ? t(title.toString(), {
+          _key: `${sliceId}_name`,
+        })
+      : displayTitle;
+  }
+
   return (
     <StyledCard
       data-test="styled-card"
@@ -255,7 +270,7 @@ function ListViewCard({
             <TitleContainer>
               {subtitle || null}
               <div className="titleRow">
-                <Tooltip title={title}>
+                <Tooltip title={displayTitle}>
                   <TitleLink>
                     {certifiedBy && (
                       <>
@@ -265,7 +280,7 @@ function ListViewCard({
                         />{' '}
                       </>
                     )}
-                    {title}
+                    {displayTitle}
                   </TitleLink>
                 </Tooltip>
                 {titleRight && <TitleRight>{titleRight}</TitleRight>}
