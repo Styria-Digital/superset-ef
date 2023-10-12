@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { MouseEvent, useState } from 'react';
+import React from 'react';
 import { MainNav as Menu } from 'src/components/Menu';
 import { styled } from '@superset-ui/core';
 import Icons from 'src/components/Icons';
@@ -34,8 +34,6 @@ export interface Languages {
 interface LanguagePickerProps {
   locale: string;
   languages: Languages;
-  callback?: Function;
-  mainFieldName?: string;
 }
 
 const StyledLabel = styled.div`
@@ -59,32 +57,13 @@ const StyledFlag = styled.i`
 `;
 
 export default function LanguagePicker(props: LanguagePickerProps) {
-  const { locale, languages, callback, mainFieldName, ...rest } = props;
-
-  const [currentLocaleFlag, setCurrentLocaleFlag] = useState<string>(
-    languages[locale].flag,
-  );
-
-  const triggerOnClick = (
-    e: MouseEvent<HTMLAnchorElement>,
-    langKey: string,
-  ) => {
-    e.preventDefault();
-
-    if (callback) {
-      callback(mainFieldName, langKey);
-      setCurrentLocaleFlag(languages[langKey].flag);
-    } else {
-      window.location.href = languages[langKey].url;
-    }
-  };
-
+  const { locale, languages, ...rest } = props;
   return (
     <SubMenu
       aria-label="Languages"
       title={
         <div className="f16">
-          <StyledFlag className={`flag ${currentLocaleFlag}`} />
+          <StyledFlag className={`flag ${languages[locale].flag}`} />
         </div>
       }
       icon={<Icons.TriangleDown />}
@@ -97,14 +76,7 @@ export default function LanguagePicker(props: LanguagePickerProps) {
         >
           <StyledLabel className="f16">
             <i className={`flag ${languages[langKey].flag}`} />
-            <a
-              href={languages[langKey].url}
-              onClick={e => {
-                triggerOnClick(e, langKey);
-              }}
-            >
-              {languages[langKey].name}
-            </a>
+            <a href={languages[langKey].url}>{languages[langKey].name}</a>
           </StyledLabel>
         </Menu.Item>
       ))}
