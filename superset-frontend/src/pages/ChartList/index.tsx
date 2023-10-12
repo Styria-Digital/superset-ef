@@ -341,24 +341,46 @@ function ChartList(props: ChartListProps) {
               description,
             },
           },
-        }: any) => (
-          <FlexRowContainer>
-            <Link to={url} data-test={`${sliceName}-list-chart-title`}>
-              {certifiedBy && (
-                <>
-                  <CertifiedBadge
-                    certifiedBy={certifiedBy}
-                    details={certificationDetails}
-                  />{' '}
-                </>
+        }: any) => {
+
+          const regex = /slice_id=(\d+)/gm;
+          const matches = regex.exec(url);
+          const sliceId = matches?.[1] ? matches[1] : null;
+
+          const sliceNameDisplay = sliceId
+            ? t(sliceName, {
+                _key: `${sliceId}_name`,
+              })
+            : sliceName;
+
+          const descriptionDisplay = sliceId
+            ? t(description, {
+                _key: `${sliceId}_description`,
+              })
+            : description;
+
+          return (
+            <FlexRowContainer>
+              <Link to={url} data-test={`${sliceName}-list-chart-title`}>
+                {certifiedBy && (
+                  <>
+                    <CertifiedBadge
+                      certifiedBy={certifiedBy}
+                      details={certificationDetails}
+                    />{' '}
+                  </>
+                )}
+                {sliceNameDisplay}
+              </Link>
+              {description && (
+                <InfoTooltip
+                  tooltip={descriptionDisplay}
+                  viewBox="0 -1 24 24"
+                />
               )}
-              {sliceName}
-            </Link>
-            {description && (
-              <InfoTooltip tooltip={description} viewBox="0 -1 24 24" />
-            )}
-          </FlexRowContainer>
-        ),
+            </FlexRowContainer>
+          );
+        },
         Header: t('Chart'),
         accessor: 'slice_name',
       },
