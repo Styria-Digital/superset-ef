@@ -191,6 +191,7 @@ function ListViewCard({
   let displayTitle = title;
 
   if (url && title) {
+    // TODO: unify this with occurence in pages/ChartList ?
     const regex = /slice_id=(\d+)/gm;
     const matches = regex.exec(url);
     const sliceId = matches?.[1] ? matches[1] : null;
