@@ -1,8 +1,3 @@
-image:
-  repository: crk8prd1.azurecr.io/efd-superset
-  tag: "build-8"
-  pullPolicy: IfNotPresent
-
 supersetNode:
   connections:
     redis_host: efd-dt.redis.cache.windows.net
