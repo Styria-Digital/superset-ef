@@ -47,7 +47,6 @@ bootstrapScript: |
     pymssql==2.2.7 \
     snowflake-sqlalchemy \
     snowflake-connector-python \
-    openssl==3.0.9 \
     redis==4.5.4 && \
   if [ ! -f ~/bootstrap ]; then echo "Running Superset with uid {{ .Values.runAsUser }}" > ~/bootstrap; fi
 
