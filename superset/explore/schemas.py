@@ -147,6 +147,7 @@ class SliceSchema(Schema):
     slice_id = fields.Integer(metadata={"description": "The slice ID."})
     slice_name = fields.String(metadata={"description": "The slice name."})
     slice_url = fields.String(metadata={"description": "The slice URL."})
+    params = fields.String(metadata={"description": "This JSON object for power users who may want to alter specific parameters."})
 
 
 class ExploreContextSchema(Schema):

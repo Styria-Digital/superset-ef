@@ -168,6 +168,7 @@ class ChartEntityResponseSchema(Schema):
     certification_details = fields.String(
         metadata={"description": certification_details_description}
     )
+    params = fields.String(metadata={"description": params_description })
 
 
 class ChartPostSchema(Schema):
