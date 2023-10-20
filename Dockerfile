@@ -99,7 +99,7 @@ RUN pip install \
     snowflake-sqlalchemy \
     snowflake-connector-python
 
-RUN pip uninstall oscrypto
+RUN pip uninstall oscrypto --yes
 RUN pip install git+https://github.com/wbond/oscrypto.git
 
 COPY --chmod=755 ./docker/run-server.sh /usr/bin/
