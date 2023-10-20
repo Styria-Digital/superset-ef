@@ -68,6 +68,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache \
     && apt-get update -qq && apt-get install -yqq --no-install-recommends \
         build-essential \
         curl \
+        git \
         default-libmysqlclient-dev \
         libsasl2-dev \
         libsasl2-modules-gssapi-mit \
@@ -93,6 +94,13 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install -e . \
     && flask fab babel-compile --target superset/translations \
     && chown -R superset:superset superset/translations
+
+RUN pip install \
+    snowflake-sqlalchemy \
+    snowflake-connector-python
+
+RUN pip uninstall oscrypto
+RUN pip install git+https://github.com/wbond/oscrypto.git
 
 COPY --chmod=755 ./docker/run-server.sh /usr/bin/
 USER superset
