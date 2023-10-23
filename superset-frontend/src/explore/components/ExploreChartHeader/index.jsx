@@ -27,6 +27,7 @@ import {
   SupersetClient,
   t,
   tn,
+  getSliceParams
 } from '@superset-ui/core';
 import { chartPropShape } from 'src/dashboard/util/propShapes';
 import AlteredSliceTag from 'src/components/AlteredSliceTag';
@@ -162,6 +163,31 @@ export const ExploreChartHeader = ({
       metadata?.dashboards,
     );
 
+  const editableTitleProps = {
+    title: sliceName,
+    canEdit:
+      !slice ||
+      canOverwrite ||
+      (slice?.owners || []).includes(user?.userId),
+    onSave: actions.updateChartTitle,
+    placeholder: t('Add the name of the chart'),
+    label: t('Chart title'),
+  };
+    
+  // TODO: if translation enabled
+  let previewDescription;
+
+  if (slice){
+    const sliceParams = getSliceParams(slice.params);
+
+    editableTitleProps.translatedTitle = t(editableTitleProps.title, {
+      _key: `${sliceParams.translation.keys.name}_name`
+    });
+    previewDescription = t(slice.description, {
+      _key: `${sliceParams.translation.keys.description}_description`
+    });
+  }
+
   const metadataBar = useMemo(() => {
     if (!metadata) {
       return null;
@@ -199,26 +225,18 @@ export const ExploreChartHeader = ({
     if (slice?.description) {
       items.push({
         type: MetadataType.DESCRIPTION,
-        value: t(slice.description, { _key: `${slice.slice_id}_description` }),
+        value: previewDescription,
       });
     }
     return <MetadataBar items={items} tooltipPlacement="bottom" />;
   }, [metadata, slice?.description]);
 
   const oldSliceName = slice?.slice_name;
+
   return (
     <>
       <PageHeaderWithActions
-        editableTitleProps={{
-          title: sliceName,
-          canEdit:
-            !slice ||
-            canOverwrite ||
-            (slice?.owners || []).includes(user?.userId),
-          onSave: actions.updateChartTitle,
-          placeholder: t('Add the name of the chart'),
-          label: t('Chart title'),
-        }}
+        editableTitleProps={editableTitleProps}
         showTitlePanelItems={!!slice}
         certificatiedBadgeProps={{
           certifiedBy: slice?.certified_by,

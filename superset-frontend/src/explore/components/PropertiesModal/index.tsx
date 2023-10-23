@@ -30,6 +30,7 @@ import {
   isFeatureEnabled,
   FeatureFlag,
   getTranslationKey,
+  getSliceParams,
 } from '@superset-ui/core';
 import Chart, { Slice } from 'src/types/Chart';
 import { getClientErrorObject } from 'src/utils/getClientErrorObject';
@@ -184,21 +185,7 @@ function PropertiesModal({
 
   // TODO: if transifex enabled
   const translataleFieldNames = ['name', 'description'];
-
-  let sliceParams: {
-    translation?: {
-      keys?: { [key: string]: string };
-    };
-  } = {};
-
-  try {
-    sliceParams = JSON.parse(slice.params || '{}');
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `"slice.params" was not parsable as valid JSON object: ${slice.params}`,
-    );
-  }
+  const sliceParams = getSliceParams(slice.params);
   // end TODO
 
   const onSubmit = async (values: {
