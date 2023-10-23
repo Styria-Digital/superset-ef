@@ -74,6 +74,7 @@ export type Slice = {
   query_context?: object;
   is_managed_externally: boolean;
   owners?: number[];
+  params?: string;
 };
 
 export default Chart;

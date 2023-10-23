@@ -16,13 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, {
-  useMemo,
-  useState,
-  useCallback,
-  useEffect,
-  useRef,
-} from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import Modal from 'src/components/Modal';
 import { Input, TranslatableField } from 'src/components/Input';
 import Button from 'src/components/Button';
@@ -35,6 +29,7 @@ import {
   styled,
   isFeatureEnabled,
   FeatureFlag,
+  getTranslationKey,
 } from '@superset-ui/core';
 import Chart, { Slice } from 'src/types/Chart';
 import { getClientErrorObject } from 'src/utils/getClientErrorObject';
@@ -47,6 +42,8 @@ import {
   OBJECT_TYPES,
 } from 'src/features/tags/tags';
 import TagType from 'src/types/TagType';
+
+import { tx } from '@transifex/native';
 
 export type PropertiesModalProps = {
   slice: Slice;
@@ -185,8 +182,24 @@ function PropertiesModal({
     });
   };
 
-  const nameRef = useRef(null);
-  const descriptionRef = useRef(null);
+  // TODO: if transifex enabled
+  const translataleFieldNames = ['name', 'description'];
+
+  let sliceParams: {
+    translation?: {
+      keys?: { [key: string]: string };
+    };
+  } = {};
+
+  try {
+    sliceParams = JSON.parse(slice.params || '{}');
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `"slice.params" was not parsable as valid JSON object: ${slice.params}`,
+    );
+  }
+  // end TODO
 
   const onSubmit = async (values: {
     certified_by?: string;
@@ -194,13 +207,16 @@ function PropertiesModal({
     description?: string;
     cache_timeout?: number;
   }) => {
+
     setSubmitting(true);
+
     const {
       certified_by: certifiedBy,
       certification_details: certificationDetails,
       description,
       cache_timeout: cacheTimeout,
     } = values;
+
     const payload: { [key: string]: any } = {
       slice_name: name || null,
       description: description || null,
@@ -236,6 +252,22 @@ function PropertiesModal({
       }
     }
 
+    // TODO: set in transifex enabled
+    const translationKeyParams: { [key: string]: any } = {};
+
+    translataleFieldNames.forEach(fieldName => {
+      translationKeyParams[fieldName] =
+        values[`${fieldName}_transifex_key_prefix`];
+    });
+
+    // eslint-disable-next-line dot-notation
+    sliceParams.translation = {
+      keys: translationKeyParams,
+    };
+
+    payload.params = JSON.stringify(sliceParams);
+    // end TODO
+
     try {
       const res = await SupersetClient.put({
         endpoint: `/api/v1/chart/${slice.slice_id}`,
@@ -252,13 +284,25 @@ function PropertiesModal({
       };
       onSave(updatedChart);
 
-      // Used in translatable field(s)
-      if (nameRef.current != null) {
-        (nameRef.current as any).onFormSaved(payload);
-      }
-      if (descriptionRef.current != null) {
-        (descriptionRef.current as any).onFormSaved(payload);
-      }
+      // TODO set to if transifex enabled
+      const translationData = {};
+
+      translataleFieldNames.forEach(fieldName => {
+        const fieldValue = values[fieldName];
+        const fieldTranslationPrefix =
+          values[`${fieldName}_transifex_key_prefix`];
+        const fieldKey = getTranslationKey(fieldTranslationPrefix, fieldName);
+
+        translationData[fieldKey] = {
+          string: fieldValue,
+          meta: {
+            context: fieldTranslationPrefix,
+          },
+        };
+      });
+
+      await tx.pushSource(translationData);
+      // end TODO
 
       addSuccessToast(t('Chart properties updated'));
       onHide();
@@ -312,6 +356,31 @@ function PropertiesModal({
     setTags([]);
   };
 
+  const initialValues: { [key: string]: any } = {
+    name: slice.slice_name || '',
+    description: slice.description || '',
+    cache_timeout: slice.cache_timeout != null ? slice.cache_timeout : '',
+    certified_by: slice.certified_by || '',
+    certification_details:
+      slice.certified_by && slice.certification_details
+        ? slice.certification_details
+        : '',
+  };
+  const fullTranslationKeys: { [key: string]: any } = {};
+
+  // TODO: if transifex enabled
+  translataleFieldNames.forEach(fieldName => {
+    const translationKeyPrefix =
+      sliceParams.translation?.keys?.[fieldName] || `${slice.slice_id}`;
+
+    initialValues[`${fieldName}_transifex_key_prefix`] = translationKeyPrefix;
+    fullTranslationKeys[fieldName] = getTranslationKey(
+      translationKeyPrefix,
+      fieldName,
+    );
+  });
+  // end TODO
+
   return (
     <Modal
       show={show}
@@ -355,16 +424,7 @@ function PropertiesModal({
         form={form}
         onFinish={onSubmit}
         layout="vertical"
-        initialValues={{
-          name: slice.slice_name || '',
-          description: slice.description || '',
-          cache_timeout: slice.cache_timeout != null ? slice.cache_timeout : '',
-          certified_by: slice.certified_by || '',
-          certification_details:
-            slice.certified_by && slice.certification_details
-              ? slice.certification_details
-              : '',
-        }}
+        initialValues={initialValues}
       >
         <Row gutter={16}>
           <Col xs={24} md={12}>
@@ -374,11 +434,8 @@ function PropertiesModal({
                 fieldType="input"
                 label={t('Name')}
                 name="name"
-                payloadName="slice_name"
-                value={name}
+                translationPreviewKey={fullTranslationKeys.name}
                 required
-                translatePrefix={`${slice.slice_id}`}
-                ref={nameRef}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                   setName(event.target.value ?? '')
                 }
@@ -389,9 +446,7 @@ function PropertiesModal({
                 fieldType="textarea"
                 label={t('Description')}
                 name="description"
-                value={slice.description || ''}
-                translatePrefix={`${slice.slice_id}`}
-                ref={descriptionRef}
+                translationPreviewKey={fullTranslationKeys.description}
               />
               <StyledHelpBlock className="help-block">
                 {t(
