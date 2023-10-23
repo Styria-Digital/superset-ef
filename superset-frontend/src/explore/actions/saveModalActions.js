@@ -179,7 +179,7 @@ export const updateSlice =
       } = getState();
 
       const sliceParams = getSliceParams(slice.params);
-      formData.translation = sliceParams.translation;
+      if (sliceParams.translation) formData.translation = sliceParams.translation;
 
       try {
         const response = await SupersetClient.put({
@@ -210,6 +210,10 @@ export const createSlice =
         form_data: { url_params: _, ...formData },
       },
     } = getState();
+
+    const sliceParams = getSliceParams(slice.params);
+    if (sliceParams.translation) formData.translation = sliceParams.translation;
+
     try {
       const response = await SupersetClient.post({
         endpoint: `/api/v1/chart/`,
