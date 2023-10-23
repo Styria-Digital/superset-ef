@@ -17,7 +17,7 @@
  * under the License.
  */
 import rison from 'rison';
-import { SupersetClient, t } from '@superset-ui/core';
+import { SupersetClient, t, getSliceParams } from '@superset-ui/core';
 import { addSuccessToast } from 'src/components/MessageToasts/actions';
 import { isEmpty } from 'lodash';
 import { buildV1ChartDataPayload } from '../exploreUtils';
@@ -107,6 +107,7 @@ export const getSlicePayload = (
   };
 
   const [datasourceId, datasourceType] = formData.datasource.split('__');
+
   const payload = {
     params: JSON.stringify(formData),
     slice_name: sliceName,
@@ -169,33 +170,37 @@ const addToasts = (isNewSlice, sliceName, addedToDashboard) => {
 //  Update existing slice
 export const updateSlice =
   (slice, sliceName, dashboards, addedToDashboard) =>
-  async (dispatch, getState) => {
-    const { slice_id: sliceId, owners, form_data: formDataFromSlice } = slice;
-    const {
-      explore: {
-        form_data: { url_params: _, ...formData },
-      },
-    } = getState();
-    try {
-      const response = await SupersetClient.put({
-        endpoint: `/api/v1/chart/${sliceId}`,
-        jsonPayload: getSlicePayload(
-          sliceName,
-          formData,
-          dashboards,
-          owners,
-          formDataFromSlice,
-        ),
-      });
+    async (dispatch, getState) => {
+      const { slice_id: sliceId, owners, form_data: formDataFromSlice } = slice;
+      const {
+        explore: {
+          form_data: { url_params: _, ...formData },
+        },
+      } = getState();
 
-      dispatch(saveSliceSuccess());
-      addToasts(false, sliceName, addedToDashboard).map(dispatch);
-      return response.json;
-    } catch (error) {
-      dispatch(saveSliceFailed());
-      throw error;
-    }
-  };
+      const sliceParams = getSliceParams(slice.params);
+      formData.translation = sliceParams.translation;
+
+      try {
+        const response = await SupersetClient.put({
+          endpoint: `/api/v1/chart/${sliceId}`,
+          jsonPayload: getSlicePayload(
+            sliceName,
+            formData,
+            dashboards,
+            owners,
+            formDataFromSlice,
+          ),
+        });
+
+        dispatch(saveSliceSuccess());
+        addToasts(false, sliceName, addedToDashboard).map(dispatch);
+        return response.json;
+      } catch (error) {
+        dispatch(saveSliceFailed());
+        throw error;
+      }
+    };
 
 //  Create new slice
 export const createSlice =
