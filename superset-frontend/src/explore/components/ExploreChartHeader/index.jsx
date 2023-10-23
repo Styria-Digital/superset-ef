@@ -180,13 +180,18 @@ export const ExploreChartHeader = ({
   if (slice){
     const sliceParams = getSliceParams(slice.params);
 
-    editableTitleProps.translatedTitle = t(editableTitleProps.title, {
-      _key: `${sliceParams.translation.keys.name}_name`
-    });
-    previewDescription = t(slice.description, {
-      _key: `${sliceParams.translation.keys.description}_description`
-    });
+    if (sliceParams.translation) {
+      editableTitleProps.translatedTitle = t(editableTitleProps.title, {
+        _key: `${sliceParams.translation.keys.name}_name`
+      });
+      previewDescription = t(slice.description, {
+        _key: `${sliceParams.translation.keys.description}_description`
+      });
+    } else {
+      console.warn(`Translation not found in params: ${slice.params}`)
+    }
   }
+  // end TODO
 
   const metadataBar = useMemo(() => {
     if (!metadata) {
