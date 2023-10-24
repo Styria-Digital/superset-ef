@@ -237,4 +237,5 @@ export type Slice = {
   datasource_name: string;
   owners: { id: number }[];
   created_by: { id: number };
+  params: string;
 };

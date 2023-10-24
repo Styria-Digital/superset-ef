@@ -22,7 +22,7 @@ import PropTypes from 'prop-types';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import { createFilter } from 'react-search-input';
-import { t, styled, css } from '@superset-ui/core';
+import { t, styled, css, getSliceParams } from '@superset-ui/core';
 import { Input } from 'src/components/Input';
 import { Select } from 'src/components';
 import Loading from 'src/components/Loading';
@@ -255,9 +255,21 @@ class SliceAdder extends React.Component {
     const type = CHART_TYPE;
     const id = NEW_CHART_ID;
 
+    let sliceNameTranslated;
+    // TODO: only if transifex active
+    const sliceParams = getSliceParams(cellData.params);
+    if (sliceParams.translation?.keys) {
+      sliceNameTranslated = t(cellData.slice_name, {
+        _key: `${sliceParams.translation.keys.name}_name`,
+      });
+    } else {
+      console.warn(`Translation not found in params: ${sliceParams}`);
+    }
+    // end TODO
+
     const meta = {
       chartId: cellData.slice_id,
-      sliceName: cellData.slice_name,
+      sliceName: cellData.slice_name
     };
     return (
       <DragDroppable
@@ -283,6 +295,7 @@ class SliceAdder extends React.Component {
             innerRef={dragSourceRef}
             style={style}
             sliceName={cellData.slice_name}
+            sliceNameTranslated={sliceNameTranslated}
             lastModified={cellData.changed_on_humanized}
             visType={cellData.viz_type}
             datasourceUrl={cellData.datasource_url}

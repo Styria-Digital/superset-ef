@@ -68,6 +68,7 @@ export const slicePropShape = PropTypes.shape({
   description: PropTypes.string,
   description_markeddown: PropTypes.string,
   owners: PropTypes.arrayOf(PropTypes.string),
+  params: PropTypes.string,
 });
 
 export const dashboardFilterPropShape = PropTypes.shape({
