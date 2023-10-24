@@ -16,18 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { ReactNode, ReactElement } from 'react';
-import { css, SupersetTheme, t, useTheme } from '@superset-ui/core';
+import React from 'react';
+import { SupersetTheme, css, t, useTheme } from '@superset-ui/core';
+import { ReactElement, ReactNode } from 'react';
 import { AntdDropdown, AntdDropdownProps } from 'src/components';
 import { TooltipPlacement } from 'src/components/Tooltip';
+import Button from '../Button';
+import CertifiedBadge, { CertifiedBadgeProps } from '../CertifiedBadge';
 import {
   DynamicEditableTitle,
   DynamicEditableTitleProps,
 } from '../DynamicEditableTitle';
-import CertifiedBadge, { CertifiedBadgeProps } from '../CertifiedBadge';
 import FaveStar, { FaveStarProps } from '../FaveStar';
 import Icons from '../Icons';
-import Button from '../Button';
 
 export const menuTriggerStyles = (theme: SupersetTheme) => css`
   width: ${theme.gridUnit * 8}px;
@@ -135,13 +136,13 @@ export const PageHeaderWithActions = ({
 }: PageHeaderWithActionsProps) => {
   const theme = useTheme();
 
-  const urlParams = new URLSearchParams(document.location.search);
-
   return (
     <div css={headerStyles} className="header-with-actions">
       <div className="title-panel">
         <DynamicEditableTitle {...editableTitleProps} />
-        {` - (${editableTitleProps.translatedTitle})`}
+        {editableTitleProps.translatedTitle
+          ? ` - (${editableTitleProps.translatedTitle})`
+          : ''}
         {showTitlePanelItems && (
           <div css={buttonsStyles}>
             {certificatiedBadgeProps?.certifiedBy && (
