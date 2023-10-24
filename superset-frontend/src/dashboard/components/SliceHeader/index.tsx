@@ -24,7 +24,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { css, styled, t } from '@superset-ui/core';
+import { css, styled, t, getSliceParams } from '@superset-ui/core';
 import { useUiConfig } from 'src/components/UiConfigContext';
 import { Tooltip } from 'src/components/Tooltip';
 import { useSelector } from 'react-redux';
@@ -192,9 +192,18 @@ const SliceHeader: FC<SliceHeaderProps> = ({
 
   const exploreUrl = `/explore/?dashboard_page_id=${dashboardPageId}&slice_id=${slice.slice_id}`;
 
-  const sliceNameTranslated = t(sliceName, {
-    _key: `${slice.slice_id}_name`,
-  });
+  let sliceNameTranslated = sliceName;
+
+  // TODO: only if transifex active
+  const sliceParams = getSliceParams(slice.params);
+  if (sliceParams.translation?.keys) {
+    sliceNameTranslated = t(sliceName, {
+      _key: `${sliceParams.translation.keys.name}_name`,
+    });
+  } else {
+    console.warn(`Translation not found in params: ${slice.params}`);
+  }
+  // end TODO.
 
   return (
     <ChartHeaderStyles data-test="slice-header" ref={innerRef}>
