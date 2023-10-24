@@ -42,11 +42,12 @@ const DEFAULT_LANGUAGE_PACK: LanguagePack = {
   },
 };
 
-// TODO: load token and secret from config
+// TODO: load token and secret from config as secret
 tx.init({
-  token: '1/706c5adf0f9eb8d1b722086ce45695a7498e82a4',
-  secret: '1/23a2ff735d117ba00ef2360eabdbcdbe993ff021',
+  token: '1/2477acc125008cc20d1cb4558f2c17acae2e0f73',
+  secret: '1/c5aa6411e2dc05001c21c91453c3f79c2b5d3a8f',
 });
+// End TODO
 
 export default class Translator {
   i18n: Jed;

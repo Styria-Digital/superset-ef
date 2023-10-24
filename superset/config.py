@@ -370,8 +370,9 @@ LANGUAGES = {
 # incomplete and not well maintained.
 LANGUAGES = {
     "en": {"flag": "us", "name": "English"},
-    "hr": {"flag": "hr", "name": "Croatian"},
-    "de": {"flag": "de", "name": "German"},
+    "fr_CH": {"flag": "fr", "name": "French (Switzerland)"},
+    "de_CH": {"flag": "de", "name": "German (Switzerland)"},
+    "it_CH": {"flag": "it", "name": "Italian (Switzerland)"},
 }
 
 
