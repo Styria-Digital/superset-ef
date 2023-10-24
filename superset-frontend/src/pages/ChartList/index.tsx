@@ -25,6 +25,7 @@ import {
   styled,
   SupersetClient,
   t,
+  getSliceParams,
 } from '@superset-ui/core';
 import React, { useState, useMemo, useCallback } from 'react';
 import rison from 'rison';
@@ -339,25 +340,30 @@ function ChartList(props: ChartListProps) {
               certified_by: certifiedBy,
               certification_details: certificationDetails,
               description,
+              params,
             },
           },
         }: any) => {
 
-          const regex = /slice_id=(\d+)/gm;
-          const matches = regex.exec(url);
-          const sliceId = matches?.[1] ? matches[1] : null;
+          let sliceNameDisplay = sliceName;
+          let descriptionDisplay = description;
 
-          const sliceNameDisplay = sliceId
-            ? t(sliceName, {
-                _key: `${sliceId}_name`,
-              })
-            : sliceName;
+          // TODO: if translation enabled
+          if (params) {
+            const sliceParams = getSliceParams(params);
 
-          const descriptionDisplay = sliceId
-            ? t(description, {
-                _key: `${sliceId}_description`,
-              })
-            : description;
+            if (sliceParams.translation?.keys) {
+              sliceNameDisplay = t(sliceNameDisplay, {
+                _key: `${sliceParams.translation.keys.name}_name`,
+              });
+              descriptionDisplay = t(descriptionDisplay, {
+                _key: `${sliceParams.translation.keys.description}_description`,
+              });
+            } else {
+              console.warn(`Translation not found in params: ${params}`)
+            }
+          }
+          // end TODO
 
           return (
             <FlexRowContainer>
