@@ -188,21 +188,6 @@ function ListViewCard({
   const Link = url && linkComponent ? linkComponent : AnchorLink;
   const theme = useTheme();
 
-  let displayTitle = title;
-
-  if (url && title) {
-    // TODO: unify this with occurence in pages/ChartList ?
-    const regex = /slice_id=(\d+)/gm;
-    const matches = regex.exec(url);
-    const sliceId = matches?.[1] ? matches[1] : null;
-
-    displayTitle = sliceId
-      ? t(title.toString(), {
-          _key: `${sliceId}_name`,
-        })
-      : displayTitle;
-  }
-
   return (
     <StyledCard
       data-test="styled-card"
@@ -271,7 +256,7 @@ function ListViewCard({
             <TitleContainer>
               {subtitle || null}
               <div className="titleRow">
-                <Tooltip title={displayTitle}>
+                <Tooltip title={title}>
                   <TitleLink>
                     {certifiedBy && (
                       <>
@@ -281,7 +266,7 @@ function ListViewCard({
                         />{' '}
                       </>
                     )}
-                    {displayTitle}
+                    {title}
                   </TitleLink>
                 </Tooltip>
                 {titleRight && <TitleRight>{titleRight}</TitleRight>}

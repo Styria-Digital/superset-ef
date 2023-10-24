@@ -17,7 +17,13 @@
  * under the License.
  */
 import React from 'react';
-import { isFeatureEnabled, FeatureFlag, t, useTheme } from '@superset-ui/core';
+import {
+  isFeatureEnabled,
+  FeatureFlag,
+  t,
+  useTheme,
+  getSliceParams,
+} from '@superset-ui/core';
 import { Link, useHistory } from 'react-router-dom';
 import ConfirmStatusChange from 'src/components/ConfirmStatusChange';
 import Icons from 'src/components/Icons';
@@ -70,6 +76,19 @@ export default function ChartCard({
   const canExport =
     hasPerm('can_export') && isFeatureEnabled(FeatureFlag.VERSIONED_EXPORT);
   const theme = useTheme();
+
+  let sliceName = chart.slice_name;
+  // TODO: only if transifex active
+  const sliceParams = getSliceParams(chart.params);
+  if (sliceParams.translation?.keys) {
+    sliceName = t(sliceName, {
+      _key: `${sliceParams.translation.keys.name}_name`,
+    });
+  } else {
+    console.warn(`Translation not found in params: ${chart.params}`);
+  }
+  // end TODO
+
 
   const menu = (
     <Menu>
@@ -143,7 +162,7 @@ export default function ChartCard({
     >
       <ListViewCard
         loading={loading}
-        title={chart.slice_name}
+        title={sliceName}
         certifiedBy={chart.certified_by}
         certificationDetails={chart.certification_details}
         cover={

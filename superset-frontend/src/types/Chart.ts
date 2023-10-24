@@ -57,6 +57,7 @@ export interface Chart {
     viz_type: string;
   };
   is_managed_externally: boolean;
+  params?: string;
 
   // TODO: Update API spec to describe `dashboards` key
   dashboards: ChartLinkedDashboard[];
