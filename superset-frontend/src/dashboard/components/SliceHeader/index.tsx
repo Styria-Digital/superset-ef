@@ -203,7 +203,7 @@ const SliceHeader: FC<SliceHeaderProps> = ({
   } else {
     console.warn(`Translation not found in params: ${slice.params}`);
   }
-  // end TODO.
+  // end TODO
 
   return (
     <ChartHeaderStyles data-test="slice-header" ref={innerRef}>
