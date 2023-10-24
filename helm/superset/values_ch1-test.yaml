@@ -71,6 +71,7 @@ configOverrides:
     'de': {'flag': 'de', 'name': 'German'},
     }
     WTF_CSRF_ENABLED = False
+    TALISMAN_ENABLED = False
   smtp: |
     import ast
     SMTP_HOST = "172.16.1.226"
