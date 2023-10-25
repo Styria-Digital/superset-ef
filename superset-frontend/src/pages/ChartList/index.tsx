@@ -26,6 +26,7 @@ import {
   SupersetClient,
   t,
   getSliceParams,
+  getTranslatedString,
 } from '@superset-ui/core';
 import React, { useState, useMemo, useCallback } from 'react';
 import rison from 'rison';
@@ -353,14 +354,18 @@ function ChartList(props: ChartListProps) {
             const sliceParams = getSliceParams(params);
 
             if (sliceParams.translation?.keys) {
-              sliceNameDisplay = t(sliceNameDisplay, {
-                _key: `${sliceParams.translation.keys.name}_name`,
-              });
-              descriptionDisplay = t(descriptionDisplay, {
-                _key: `${sliceParams.translation.keys.description}_description`,
-              });
+              sliceNameDisplay = getTranslatedString(
+                sliceNameDisplay,
+                sliceParams.translation.keys.name,
+                'name',
+              );
+              descriptionDisplay = getTranslatedString(
+                descriptionDisplay,
+                sliceParams.translation.keys.description,
+                'description',
+              );
             } else {
-              console.warn(`Translation not found in params: ${params}`)
+              console.warn(`Translation not found in params: ${params}`);
             }
           }
           // end TODO

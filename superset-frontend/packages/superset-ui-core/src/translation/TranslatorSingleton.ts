@@ -71,9 +71,16 @@ function tn(key: string, ...args: unknown[]) {
   return getInstance().translateWithNumber(key, ...args);
 }
 
-// TODO: apply EF's convention for key generation
 function getTranslationKey(prefix: string, fieldName: string) {
-  return `${prefix}_${fieldName}`;
+  return `bi.superset.${prefix}.${fieldName}`;
+}
+
+function getTranslatedString(
+  sourceString: string,
+  prefix: string,
+  fieldName: string,
+) {
+  return t(sourceString, { _key: getTranslationKey(prefix, fieldName) });
 }
 
 export {
@@ -85,4 +92,5 @@ export {
   tn,
   resetTranslation,
   getTranslationKey,
+  getTranslatedString,
 };

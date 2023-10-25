@@ -23,6 +23,7 @@ import {
   t,
   useTheme,
   getSliceParams,
+  getTranslatedString,
 } from '@superset-ui/core';
 import { Link, useHistory } from 'react-router-dom';
 import ConfirmStatusChange from 'src/components/ConfirmStatusChange';
@@ -81,9 +82,11 @@ export default function ChartCard({
   // TODO: only if transifex active
   const sliceParams = getSliceParams(chart.params);
   if (sliceParams.translation?.keys) {
-    sliceName = t(sliceName, {
-      _key: `${sliceParams.translation.keys.name}_name`,
-    });
+    sliceName = getTranslatedString(
+      sliceName,
+      sliceParams.translation.keys.name,
+      'name',
+    );
   } else {
     console.warn(`Translation not found in params: ${chart.params}`);
   }

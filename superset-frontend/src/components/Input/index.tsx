@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { forwardRef } from 'react';
+import React from 'react';
 
 import { styled, t } from '@superset-ui/core';
 import { Input as AntdInput, InputNumber as AntdInputNumber } from 'antd';

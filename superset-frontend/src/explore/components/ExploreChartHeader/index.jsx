@@ -27,7 +27,9 @@ import {
   SupersetClient,
   t,
   tn,
-  getSliceParams
+  getSliceParams,
+  getTranslationKey,
+  getTranslatedString
 } from '@superset-ui/core';
 import { chartPropShape } from 'src/dashboard/util/propShapes';
 import AlteredSliceTag from 'src/components/AlteredSliceTag';
@@ -181,12 +183,8 @@ export const ExploreChartHeader = ({
     const sliceParams = getSliceParams(slice.params);
 
     if (sliceParams.translation) {
-      editableTitleProps.translatedTitle = t(editableTitleProps.title, {
-        _key: `${sliceParams.translation.keys.name}_name`
-      });
-      previewDescription = t(slice.description, {
-        _key: `${sliceParams.translation.keys.description}_description`
-      });
+      editableTitleProps.translatedTitle = getTranslatedString(editableTitleProps.title, sliceParams.translation.keys.name, 'name');
+      previewDescription = getTranslatedString(slice.description, sliceParams.translation.keys.description, 'description');
     } else {
       console.warn(`Translation not found in params: ${slice.params}`)
     }

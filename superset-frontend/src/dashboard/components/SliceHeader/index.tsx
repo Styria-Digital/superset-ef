@@ -24,7 +24,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { css, styled, t, getSliceParams } from '@superset-ui/core';
+import { css, styled, t, getSliceParams, getTranslatedString } from '@superset-ui/core';
 import { useUiConfig } from 'src/components/UiConfigContext';
 import { Tooltip } from 'src/components/Tooltip';
 import { useSelector } from 'react-redux';
@@ -197,9 +197,11 @@ const SliceHeader: FC<SliceHeaderProps> = ({
   // TODO: only if transifex active
   const sliceParams = getSliceParams(slice.params);
   if (sliceParams.translation?.keys) {
-    sliceNameTranslated = t(sliceName, {
-      _key: `${sliceParams.translation.keys.name}_name`,
-    });
+    sliceNameTranslated = getTranslatedString(
+      sliceName,
+      sliceParams.translation.keys.name,
+      'name'
+    )
   } else {
     console.warn(`Translation not found in params: ${slice.params}`);
   }
