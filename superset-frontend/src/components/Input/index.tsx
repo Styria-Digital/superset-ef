@@ -67,8 +67,9 @@ interface Props {
   onChange?: Function;
 }
 
-export const TranslatableField = forwardRef((props: Props) => {
-  const { fieldType, name, required, label, translationPreviewKey, onChange } = props;
+export const TranslatableField = (props: Props) => {
+  const { fieldType, name, required, label, translationPreviewKey, onChange } =
+    props;
   let { rows } = props;
 
   rows = fieldType === 'textarea' ? rows || 4 : 0;
@@ -115,4 +116,4 @@ export const TranslatableField = forwardRef((props: Props) => {
       </div>
     </div>
   );
-});
+};
