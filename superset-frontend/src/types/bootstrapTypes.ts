@@ -153,6 +153,7 @@ export interface CommonBootstrapData {
   theme_overrides: JsonObject;
   menu_data: MenuData;
   d3_format: Partial<FormatLocaleDefinition>;
+  transifex: JsonObject;
 }
 
 export interface BootstrapData {

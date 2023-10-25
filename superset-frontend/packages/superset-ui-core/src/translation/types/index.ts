@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { JsonObject } from '../../connection';
 import { Jed as BaseJed, JedOptions, DomainData, Translations } from './jed';
 
 export * from './jed';
@@ -63,6 +64,7 @@ export interface Jed extends BaseJed {
  */
 export interface TranslatorConfig {
   languagePack?: LanguagePack;
+  transifex?: JsonObject;
 }
 
 /**

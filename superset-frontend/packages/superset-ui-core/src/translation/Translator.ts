@@ -42,13 +42,6 @@ const DEFAULT_LANGUAGE_PACK: LanguagePack = {
   },
 };
 
-// TODO: load token and secret from config as secret
-tx.init({
-  token: '1/2477acc125008cc20d1cb4558f2c17acae2e0f73',
-  secret: '1/c5aa6411e2dc05001c21c91453c3f79c2b5d3a8f',
-});
-// End TODO
-
 export default class Translator {
   i18n: Jed;
 
@@ -58,10 +51,11 @@ export default class Translator {
 
   constructor(config: TranslatorConfig = {}) {
     let { languagePack = DEFAULT_LANGUAGE_PACK } = config;
+    const { transifex: transifexConfig } = config;
 
     if (languagePack === null) {
       languagePack = DEFAULT_LANGUAGE_PACK;
-      console.warn(
+      logging.warn(
         '[Translations] no language pack found for selceted language, falling back to default one!',
       );
     }
@@ -70,13 +64,22 @@ export default class Translator {
     this.locale = this.i18n.options.locale_data.superset[''].lang as Locale;
     this.transifexLoaded = false;
 
-    tx.setCurrentLocale(this.locale)
-      .then(() => {
-        console.info(`[Transifex] Language ('${this.locale}') content loaded.`);
+    if (transifexConfig?.enabled) {
+      tx.init({
+        token: transifexConfig.token,
+        secret: transifexConfig.secret,
+      });
 
-        this.transifexLoaded = true;
-      })
-      .catch(error => console.error(`[Transifex] ${error}`));
+      tx.setCurrentLocale(this.locale)
+        .then(() => {
+          logging.info(
+            `[Transifex] Language ('${this.locale}') content loaded.`,
+          );
+
+          this.transifexLoaded = true;
+        })
+        .catch(error => logging.error(`[Transifex] ${error}`));
+    }
   }
 
   /**

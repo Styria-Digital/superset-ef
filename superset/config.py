@@ -375,6 +375,11 @@ LANGUAGES = {
     "it_CH": {"flag": "it", "name": "Italian (Switzerland)"},
 }
 
+TRANSIFEX = {
+    "enabled": True,
+    "token": "1/2477acc125008cc20d1cb4558f2c17acae2e0f73",
+    "secret": "1/c5aa6411e2dc05001c21c91453c3f79c2b5d3a8f",
+}
 
 # Override the default d3 locale format
 # Default values are equivalent to
