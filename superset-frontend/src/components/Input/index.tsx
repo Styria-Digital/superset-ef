@@ -101,20 +101,12 @@ export const TranslatableField = forwardRef((props: Props) => {
           name={`${name}_transifex_key_prefix`}
           required
         >
-          {/* TODO: Enabled edit of value? If so, 
-            store prefix somewhere to db so it can be retrieved for 
-            a display of slice 
-          */}
           <Input
             aria-label={t('Translation key prefix')}
             name={`${name}_transifex_key_prefix`}
             id={`${name}_transifex_key_prefix`}
             type="text"
           />
-          {/* TODO: If edit enabled, uncomment this */}
-          {/* <StyledHelpBlock className="help-block">
-            {`Default: ${translatePrefix}`}
-          </StyledHelpBlock> */}
         </StyledFormItem>
       </div>
       <div style={{ padding: '0 0 8px' }}>{t('Preview')}</div>
