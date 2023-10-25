@@ -45,7 +45,7 @@ import {
 import TagType from 'src/types/TagType';
 
 import { tx } from '@transifex/native';
-import { LanguagePicker } from '@transifex/react';
+import { LanguagePicker, useLocale } from '@transifex/react';
 
 export type PropertiesModalProps = {
   slice: Slice;
@@ -187,7 +187,13 @@ function PropertiesModal({
   // TODO: if transifex enabled
   const translatableFieldNames = ['name', 'description'];
   const sliceParams = getSliceParams(slice.params);
+  const [currentLocale, setCurrentLocale] = useState(useLocale());
   // end TODO
+
+  const onClose = () => {
+    tx.setCurrentLocale(currentLocale);
+    onHide();
+  };
 
   const onSubmit = async (values: {
     certified_by?: string;
@@ -195,7 +201,6 @@ function PropertiesModal({
     description?: string;
     cache_timeout?: number;
   }) => {
-
     setSubmitting(true);
 
     const {
@@ -289,11 +294,13 @@ function PropertiesModal({
         };
       });
 
-      await tx.pushSource(translationData);
+      tx.pushSource(translationData).then(() => {
+        console.info('[Transifex] Strings and keys sucessfully sent!');
+      });
       // end TODO
 
       addSuccessToast(t('Chart properties updated'));
-      onHide();
+      onClose();
     } catch (res) {
       const clientError = await getClientErrorObject(res);
       showError(clientError);
@@ -372,7 +379,7 @@ function PropertiesModal({
   return (
     <Modal
       show={show}
-      onHide={onHide}
+      onHide={onClose}
       title={t('Edit Chart Properties')}
       footer={
         <>
@@ -383,7 +390,7 @@ function PropertiesModal({
             data-test="properties-modal-cancel-button"
             htmlType="button"
             buttonSize="small"
-            onClick={onHide}
+            onClick={onClose}
             cta
           >
             {t('Cancel')}
