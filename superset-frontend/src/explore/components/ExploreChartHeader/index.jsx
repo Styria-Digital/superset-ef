@@ -234,7 +234,7 @@ export const ExploreChartHeader = ({
       });
     }
     return <MetadataBar items={items} tooltipPlacement="bottom" />;
-  }, [metadata, slice?.description]);
+  }, [metadata, slice?.description, previewDescription]);
 
   const oldSliceName = slice?.slice_name;
 
