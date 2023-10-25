@@ -112,7 +112,7 @@ export const TranslatableField = (props: Props) => {
       </div>
       <div style={{ padding: '0 0 8px' }}>{t('Preview')}</div>
       <div className="translation_preview" style={translationPreviewStyle}>
-        <T _key={translationPreviewKey} />
+        <T _key={translationPreviewKey} _str="" />
       </div>
     </div>
   );
