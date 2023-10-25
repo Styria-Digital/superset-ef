@@ -21,7 +21,7 @@ import React, { forwardRef } from 'react';
 import { styled, t } from '@superset-ui/core';
 import { Input as AntdInput, InputNumber as AntdInputNumber } from 'antd';
 
-import { T, LanguagePicker } from '@transifex/react';
+import { T } from '@transifex/react';
 import { AntdForm } from 'src/components';
 
 export const Input = styled(AntdInput)`
@@ -116,9 +116,6 @@ export const TranslatableField = forwardRef((props: Props) => {
             {`Default: ${translatePrefix}`}
           </StyledHelpBlock> */}
         </StyledFormItem>
-        <div style={{ marginLeft: '2rem', padding: '2.5rem 0 0' }}>
-          <LanguagePicker />
-        </div>
       </div>
       <div style={{ padding: '0 0 8px' }}>{t('Preview')}</div>
       <div className="translation_preview" style={translationPreviewStyle}>

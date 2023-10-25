@@ -45,6 +45,7 @@ import {
 import TagType from 'src/types/TagType';
 
 import { tx } from '@transifex/native';
+import { LanguagePicker } from '@transifex/react';
 
 export type PropertiesModalProps = {
   slice: Slice;
@@ -183,11 +184,6 @@ function PropertiesModal({
     });
   };
 
-  // TODO: if transifex enabled
-  const translataleFieldNames = ['name', 'description'];
-  const sliceParams = getSliceParams(slice.params);
-  // end TODO
-
   const onSubmit = async (values: {
     certified_by?: string;
     certification_details?: string;
@@ -240,9 +236,11 @@ function PropertiesModal({
     }
 
     // TODO: set in transifex enabled
+    const translatableFieldNames = ['name', 'description'];
+    const sliceParams = getSliceParams(slice.params);
     const translationKeyParams: { [key: string]: any } = {};
 
-    translataleFieldNames.forEach(fieldName => {
+    translatableFieldNames.forEach(fieldName => {
       translationKeyParams[fieldName] =
         values[`${fieldName}_transifex_key_prefix`];
     });
@@ -274,7 +272,7 @@ function PropertiesModal({
       // TODO set to if transifex enabled
       const translationData = {};
 
-      translataleFieldNames.forEach(fieldName => {
+      translatableFieldNames.forEach(fieldName => {
         const fieldValue = values[fieldName];
         const fieldTranslationPrefix =
           values[`${fieldName}_transifex_key_prefix`];
@@ -356,7 +354,7 @@ function PropertiesModal({
   const fullTranslationKeys: { [key: string]: any } = {};
 
   // TODO: if transifex enabled
-  translataleFieldNames.forEach(fieldName => {
+  translatableFieldNames.forEach(fieldName => {
     const translationKeyPrefix =
       sliceParams.translation?.keys?.[fieldName] || `${slice.slice_id}`;
 
@@ -375,6 +373,9 @@ function PropertiesModal({
       title={t('Edit Chart Properties')}
       footer={
         <>
+          <div style={{ float: 'left' }}>
+            Translation preview: <LanguagePicker />
+          </div>
           <Button
             data-test="properties-modal-cancel-button"
             htmlType="button"
