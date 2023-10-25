@@ -184,6 +184,11 @@ function PropertiesModal({
     });
   };
 
+  // TODO: if transifex enabled
+  const translatableFieldNames = ['name', 'description'];
+  const sliceParams = getSliceParams(slice.params);
+  // end TODO
+
   const onSubmit = async (values: {
     certified_by?: string;
     certification_details?: string;
@@ -236,8 +241,6 @@ function PropertiesModal({
     }
 
     // TODO: set in transifex enabled
-    const translatableFieldNames = ['name', 'description'];
-    const sliceParams = getSliceParams(slice.params);
     const translationKeyParams: { [key: string]: any } = {};
 
     translatableFieldNames.forEach(fieldName => {
