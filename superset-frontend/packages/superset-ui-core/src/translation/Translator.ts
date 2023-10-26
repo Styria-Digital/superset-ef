@@ -28,6 +28,7 @@ import {
   LocaleData,
   LanguagePack,
 } from './types';
+import { JsonObject } from '../connection';
 
 const DEFAULT_LANGUAGE_PACK: LanguagePack = {
   domain: 'superset',
@@ -49,6 +50,8 @@ export default class Translator {
 
   transifexLoaded: boolean;
 
+  transifexConfig?: JsonObject;
+
   constructor(config: TranslatorConfig = {}) {
     let { languagePack = DEFAULT_LANGUAGE_PACK } = config;
     const { transifex: transifexConfig } = config;
@@ -63,11 +66,12 @@ export default class Translator {
     this.i18n = new UntypedJed(languagePack) as Jed;
     this.locale = this.i18n.options.locale_data.superset[''].lang as Locale;
     this.transifexLoaded = false;
+    this.transifexConfig = transifexConfig;
 
-    if (transifexConfig?.enabled) {
+    if (this.transifexConfig?.enabled) {
       tx.init({
-        token: transifexConfig.token,
-        secret: transifexConfig.secret,
+        token: this.transifexConfig.token,
+        secret: this.transifexConfig.secret,
       });
 
       tx.setCurrentLocale(this.locale)

@@ -377,6 +377,7 @@ LANGUAGES = {
 
 TRANSIFEX = {
     "enabled": True,
+    "key_prefix": "bi.superset",
     "token": "1/2477acc125008cc20d1cb4558f2c17acae2e0f73",
     "secret": "1/c5aa6411e2dc05001c21c91453c3f79c2b5d3a8f",
 }

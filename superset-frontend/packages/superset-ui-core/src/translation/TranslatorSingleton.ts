@@ -71,10 +71,24 @@ function tn(key: string, ...args: unknown[]) {
   return getInstance().translateWithNumber(key, ...args);
 }
 
+/**
+ * Constructs translation key for string that is passed to transifex service.
+ * Uses `TRANSIFEX.key_prefix` as first part of key
+ */
 function getTranslationKey(prefix: string, fieldName: string) {
-  return `bi.superset.${prefix}.${fieldName}`;
+  let baseKeyPrefix = '';
+
+  if (getInstance().transifexConfig?.key_prefix) {
+    baseKeyPrefix = getInstance().transifexConfig?.key_prefix;
+  }
+
+  return `${baseKeyPrefix}.${prefix}.${fieldName}`;
 }
 
+/**
+ * returns translation based on passed field prefix and field name along with
+ * original string from source.
+ */
 function getTranslatedString(
   sourceString: string,
   prefix: string,
