@@ -134,8 +134,8 @@ export {
   t,
   tn,
   resetTranslation,
+  getInstance as getTranslatorInstance,
   getTranslationKey,
   getTranslatedString,
   pushToTransifex,
-  getInstance as getTranslatorInstance,
 };
