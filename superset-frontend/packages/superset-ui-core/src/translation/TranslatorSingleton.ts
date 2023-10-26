@@ -107,4 +107,5 @@ export {
   resetTranslation,
   getTranslationKey,
   getTranslatedString,
+  getInstance as getTranslatorInstance,
 };
