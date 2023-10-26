@@ -18,7 +18,7 @@
  */
 import React from 'react';
 
-import { styled, t } from '@superset-ui/core';
+import { styled, t, getTranslatorInstance } from '@superset-ui/core';
 import { Input as AntdInput, InputNumber as AntdInputNumber } from 'antd';
 
 import { T } from '@transifex/react';
@@ -67,6 +67,8 @@ interface Props {
   onChange?: Function;
 }
 
+const translatorInstance = getTranslatorInstance();
+
 export const TranslatableField = (props: Props) => {
   const { fieldType, name, required, label, translationPreviewKey, onChange } =
     props;
@@ -80,18 +82,8 @@ export const TranslatableField = (props: Props) => {
   };
   const FieldComponent = FieldMap[fieldType];
 
-  return (
-    <div>
-      <StyledFormItem label={label} name={name} required={required}>
-        <FieldComponent
-          rows={rows}
-          style={{ maxWidth: '100%' }}
-          name={name}
-          id={name}
-          required={required}
-          onChange={onChange}
-        />
-      </StyledFormItem>
+  const translationElements = (
+    <div className="translation_wrap">
       <div style={{ padding: '8px 0px' }}>Translations</div>
       <div
         className="translation_fields_wrap"
@@ -114,6 +106,22 @@ export const TranslatableField = (props: Props) => {
       <div className="translation_preview" style={translationPreviewStyle}>
         <T _key={translationPreviewKey} _str="" />
       </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <StyledFormItem label={label} name={name} required={required}>
+        <FieldComponent
+          rows={rows}
+          style={{ maxWidth: '100%' }}
+          name={name}
+          id={name}
+          required={required}
+          onChange={onChange}
+        />
+      </StyledFormItem>
+      {translatorInstance.transifexLoaded && translationElements}
     </div>
   );
 };

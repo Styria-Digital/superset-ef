@@ -31,6 +31,7 @@ import {
   FeatureFlag,
   getTranslationKey,
   getSliceParams,
+  getTranslatorInstance,
 } from '@superset-ui/core';
 import Chart, { Slice } from 'src/types/Chart';
 import { getClientErrorObject } from 'src/utils/getClientErrorObject';
@@ -66,6 +67,8 @@ const StyledFormItem = styled(AntdForm.Item)`
 const StyledHelpBlock = styled.span`
   margin-bottom: 0;
 `;
+
+const translatorInstance = getTranslatorInstance();
 
 function PropertiesModal({
   slice,
@@ -184,11 +187,13 @@ function PropertiesModal({
     });
   };
 
-  // TODO: if transifex enabled
-  const translatableFieldNames = ['name', 'description'];
-  const sliceParams = getSliceParams(slice.params);
+  let translatableFieldNames: string[] = [];
   const [currentLocale, setCurrentLocale] = useState(useLocale());
-  // end TODO
+  const sliceParams = getSliceParams(slice.params);
+
+  if (translatorInstance.transifexLoaded) {
+    translatableFieldNames = ['name', 'description'];
+  }
 
   const onClose = () => {
     tx.setCurrentLocale(currentLocale);
@@ -245,21 +250,21 @@ function PropertiesModal({
       }
     }
 
-    // TODO: set in transifex enabled
-    const translationKeyParams: { [key: string]: any } = {};
+    if (translatorInstance.transifexLoaded) {
+      const translationKeyParams: { [key: string]: any } = {};
 
-    translatableFieldNames.forEach(fieldName => {
-      translationKeyParams[fieldName] =
-        values[`${fieldName}_transifex_key_prefix`];
-    });
+      translatableFieldNames.forEach(fieldName => {
+        translationKeyParams[fieldName] =
+          values[`${fieldName}_transifex_key_prefix`];
+      });
 
-    // eslint-disable-next-line dot-notation
-    sliceParams.translation = {
-      keys: translationKeyParams,
-    };
+      // eslint-disable-next-line dot-notation
+      sliceParams.translation = {
+        keys: translationKeyParams,
+      };
+    }
 
     payload.params = JSON.stringify(sliceParams);
-    // end TODO
 
     try {
       const res = await SupersetClient.put({
@@ -277,27 +282,27 @@ function PropertiesModal({
       };
       onSave(updatedChart);
 
-      // TODO set to if transifex enabled
-      const translationData = {};
+      if (translatorInstance.transifexLoaded) {
+        const translationData = {};
 
-      translatableFieldNames.forEach(fieldName => {
-        const fieldValue = values[fieldName];
-        const fieldTranslationPrefix =
-          values[`${fieldName}_transifex_key_prefix`];
-        const fieldKey = getTranslationKey(fieldTranslationPrefix, fieldName);
+        translatableFieldNames.forEach(fieldName => {
+          const fieldValue = values[fieldName];
+          const fieldTranslationPrefix =
+            values[`${fieldName}_transifex_key_prefix`];
+          const fieldKey = getTranslationKey(fieldTranslationPrefix, fieldName);
 
-        translationData[fieldKey] = {
-          string: fieldValue,
-          meta: {
-            context: fieldTranslationPrefix,
-          },
-        };
-      });
+          translationData[fieldKey] = {
+            string: fieldValue,
+            meta: {
+              context: fieldTranslationPrefix,
+            },
+          };
+        });
 
-      tx.pushSource(translationData).then(() => {
-        console.info('[Transifex] Strings and keys sucessfully sent!');
-      });
-      // end TODO
+        tx.pushSource(translationData).then(() => {
+          console.info('[Transifex] Strings and keys sucessfully sent!');
+        });
+      }
 
       addSuccessToast(t('Chart properties updated'));
       onClose();
@@ -363,18 +368,24 @@ function PropertiesModal({
   };
   const fullTranslationKeys: { [key: string]: any } = {};
 
-  // TODO: if transifex enabled
-  translatableFieldNames.forEach(fieldName => {
-    const translationKeyPrefix =
-      sliceParams.translation?.keys?.[fieldName] || `${slice.slice_id}`;
+  if (translatorInstance.transifexLoaded) {
+    translatableFieldNames.forEach(fieldName => {
+      const translationKeyPrefix =
+        sliceParams.translation?.keys?.[fieldName] || `${slice.slice_id}`;
 
-    initialValues[`${fieldName}_transifex_key_prefix`] = translationKeyPrefix;
-    fullTranslationKeys[fieldName] = getTranslationKey(
-      translationKeyPrefix,
-      fieldName,
-    );
-  });
-  // end TODO
+      initialValues[`${fieldName}_transifex_key_prefix`] = translationKeyPrefix;
+      fullTranslationKeys[fieldName] = getTranslationKey(
+        translationKeyPrefix,
+        fieldName,
+      );
+    });
+  }
+
+  const translationSwitchElement = (
+    <div style={{ float: 'left' }}>
+      Translation preview: <LanguagePicker />
+    </div>
+  );
 
   return (
     <Modal
@@ -383,9 +394,7 @@ function PropertiesModal({
       title={t('Edit Chart Properties')}
       footer={
         <>
-          <div style={{ float: 'left' }}>
-            Translation preview: <LanguagePicker />
-          </div>
+          {translatorInstance.transifexLoaded && translationSwitchElement}
           <Button
             data-test="properties-modal-cancel-button"
             htmlType="button"
