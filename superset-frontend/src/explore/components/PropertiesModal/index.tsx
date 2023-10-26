@@ -32,6 +32,7 @@ import {
   getTranslationKey,
   getSliceParams,
   getTranslatorInstance,
+  pushToTransifex,
 } from '@superset-ui/core';
 import Chart, { Slice } from 'src/types/Chart';
 import { getClientErrorObject } from 'src/utils/getClientErrorObject';
@@ -196,7 +197,7 @@ function PropertiesModal({
   }
 
   const onClose = () => {
-    tx.setCurrentLocale(currentLocale);
+    if (translatorInstance.transifexLoaded) tx.setCurrentLocale(currentLocale);
     onHide();
   };
 
@@ -283,25 +284,13 @@ function PropertiesModal({
       onSave(updatedChart);
 
       if (translatorInstance.transifexLoaded) {
-        const translationData = {};
-
-        translatableFieldNames.forEach(fieldName => {
-          const fieldValue = values[fieldName];
-          const fieldTranslationPrefix =
-            values[`${fieldName}_transifex_key_prefix`];
-          const fieldKey = getTranslationKey(fieldTranslationPrefix, fieldName);
-
-          translationData[fieldKey] = {
-            string: fieldValue,
-            meta: {
-              context: fieldTranslationPrefix,
-            },
-          };
-        });
-
-        tx.pushSource(translationData).then(() => {
-          console.info('[Transifex] Strings and keys sucessfully sent!');
-        });
+        pushToTransifex(
+          translatableFieldNames.map(fieldName => ({
+            name: fieldName,
+            value: values[fieldName],
+            prefix: values[`${fieldName}_transifex_key_prefix`],
+          })),
+        );
       }
 
       addSuccessToast(t('Chart properties updated'));

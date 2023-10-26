@@ -19,6 +19,7 @@
 
 /* eslint no-console: 0 */
 
+import { tx } from '@transifex/native';
 import Translator from './Translator';
 import { TranslatorConfig, Translations, LocaleData } from './types';
 
@@ -97,6 +98,34 @@ function getTranslatedString(
   return t(sourceString, { _key: getTranslationKey(prefix, fieldName) });
 }
 
+/**
+ * Shorthand to push list of field objects to Transifex API
+ */
+function pushToTransifex(
+  fields: {
+    name: string;
+    value: string;
+    prefix: string;
+  }[],
+) {
+  const translationData = {};
+
+  fields.forEach(field => {
+    const fieldKey = getTranslationKey(field.prefix, field.name);
+
+    translationData[fieldKey] = {
+      string: field.value,
+      meta: {
+        context: field.prefix,
+      },
+    };
+  });
+
+  tx.pushSource(translationData).then(() => {
+    console.info('[Transifex] Strings and keys sucessfully sent!');
+  });
+}
+
 export {
   configure,
   addTranslation,
@@ -107,5 +136,6 @@ export {
   resetTranslation,
   getTranslationKey,
   getTranslatedString,
+  pushToTransifex,
   getInstance as getTranslatorInstance,
 };
