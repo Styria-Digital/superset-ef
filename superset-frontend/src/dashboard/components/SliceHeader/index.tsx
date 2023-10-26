@@ -24,7 +24,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { css, styled, t, getSliceParams, getTranslatedString } from '@superset-ui/core';
+import {
+  css,
+  styled,
+  t,
+  getSliceParams,
+  getTranslatedString,
+  getTranslatorInstance,
+} from '@superset-ui/core';
 import { useUiConfig } from 'src/components/UiConfigContext';
 import { Tooltip } from 'src/components/Tooltip';
 import { useSelector } from 'react-redux';
@@ -127,6 +134,8 @@ const ChartHeaderStyles = styled.div`
   `}
 `;
 
+const translatorInstance = getTranslatorInstance();
+
 const SliceHeader: FC<SliceHeaderProps> = ({
   innerRef = null,
   forceRefresh = () => ({}),
@@ -192,20 +201,20 @@ const SliceHeader: FC<SliceHeaderProps> = ({
 
   const exploreUrl = `/explore/?dashboard_page_id=${dashboardPageId}&slice_id=${slice.slice_id}`;
 
-  let sliceNameTranslated = sliceName;
+  let sliceNamePreview = sliceName;
 
-  // TODO: only if transifex active
-  const sliceParams = getSliceParams(slice.params);
-  if (sliceParams.translation?.keys) {
-    sliceNameTranslated = getTranslatedString(
-      sliceName,
-      sliceParams.translation.keys.name,
-      'name'
-    )
-  } else {
-    console.warn(`Translation not found in params: ${slice.params}`);
+  if (translatorInstance.transifexLoaded) {
+    const sliceParams = getSliceParams(slice.params);
+    if (sliceParams.translation?.keys) {
+      sliceNamePreview = getTranslatedString(
+        sliceName,
+        sliceParams.translation.keys.name,
+        'name',
+      );
+    } else {
+      console.warn(`Translation not found in params: ${slice.params}`);
+    }
   }
-  // end TODO
 
   return (
     <ChartHeaderStyles data-test="slice-header" ref={innerRef}>
@@ -213,7 +222,7 @@ const SliceHeader: FC<SliceHeaderProps> = ({
         <Tooltip title={headerTooltip}>
           <EditableTitle
             title={
-              sliceNameTranslated ||
+              sliceNamePreview ||
               (editMode
                 ? '---' // this makes an empty title clickable
                 : '')

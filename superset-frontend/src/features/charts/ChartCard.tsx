@@ -24,6 +24,7 @@ import {
   useTheme,
   getSliceParams,
   getTranslatedString,
+  getTranslatorInstance,
 } from '@superset-ui/core';
 import { Link, useHistory } from 'react-router-dom';
 import ConfirmStatusChange from 'src/components/ConfirmStatusChange';
@@ -55,6 +56,8 @@ interface ChartCardProps {
   handleBulkChartExport: (chartsToExport: Chart[]) => void;
 }
 
+const translatorInstance = getTranslatorInstance();
+
 export default function ChartCard({
   chart,
   hasPerm,
@@ -79,19 +82,19 @@ export default function ChartCard({
   const theme = useTheme();
 
   let sliceName = chart.slice_name;
-  // TODO: only if transifex active
-  const sliceParams = getSliceParams(chart.params);
-  if (sliceParams.translation?.keys) {
-    sliceName = getTranslatedString(
-      sliceName,
-      sliceParams.translation.keys.name,
-      'name',
-    );
-  } else {
-    console.warn(`Translation not found in params: ${chart.params}`);
-  }
-  // end TODO
 
+  if (translatorInstance.transifexLoaded) {
+    const sliceParams = getSliceParams(chart.params);
+    if (sliceParams.translation?.keys) {
+      sliceName = getTranslatedString(
+        sliceName,
+        sliceParams.translation.keys.name,
+        'name',
+      );
+    } else {
+      console.warn(`Translation not found in params: ${chart.params}`);
+    }
+  }
 
   const menu = (
     <Menu>
