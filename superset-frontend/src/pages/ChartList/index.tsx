@@ -27,6 +27,7 @@ import {
   t,
   getSliceParams,
   getTranslatedString,
+  getTranslatorInstance,
 } from '@superset-ui/core';
 import React, { useState, useMemo, useCallback } from 'react';
 import rison from 'rison';
@@ -156,6 +157,8 @@ interface ChartListProps {
 const StyledActions = styled.div`
   color: ${({ theme }) => theme.colors.grayscale.base};
 `;
+
+const translatorInstance = getTranslatorInstance();
 
 function ChartList(props: ChartListProps) {
   const {
@@ -349,8 +352,7 @@ function ChartList(props: ChartListProps) {
           let sliceNameDisplay = sliceName;
           let descriptionDisplay = description;
 
-          // TODO: if translation enabled
-          if (params) {
+          if (translatorInstance.transifexLoaded && params) {
             const sliceParams = getSliceParams(params);
 
             if (sliceParams.translation?.keys) {
@@ -368,7 +370,6 @@ function ChartList(props: ChartListProps) {
               console.warn(`Translation not found in params: ${params}`);
             }
           }
-          // end TODO
 
           return (
             <FlexRowContainer>
