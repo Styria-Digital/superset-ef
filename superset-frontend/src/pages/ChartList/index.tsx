@@ -25,6 +25,9 @@ import {
   styled,
   SupersetClient,
   t,
+  getSliceParams,
+  getTranslatedString,
+  getTranslatorInstance,
 } from '@superset-ui/core';
 import React, { useState, useMemo, useCallback } from 'react';
 import rison from 'rison';
@@ -154,6 +157,8 @@ interface ChartListProps {
 const StyledActions = styled.div`
   color: ${({ theme }) => theme.colors.grayscale.base};
 `;
+
+const translatorInstance = getTranslatorInstance();
 
 function ChartList(props: ChartListProps) {
   const {
@@ -339,26 +344,55 @@ function ChartList(props: ChartListProps) {
               certified_by: certifiedBy,
               certification_details: certificationDetails,
               description,
+              params,
             },
           },
-        }: any) => (
-          <FlexRowContainer>
-            <Link to={url} data-test={`${sliceName}-list-chart-title`}>
-              {certifiedBy && (
-                <>
-                  <CertifiedBadge
-                    certifiedBy={certifiedBy}
-                    details={certificationDetails}
-                  />{' '}
-                </>
+        }: any) => {
+
+          let sliceNameDisplay = sliceName;
+          let descriptionDisplay = description;
+
+          if (translatorInstance.transifexLoaded && params) {
+            const sliceParams = getSliceParams(params);
+
+            if (sliceParams.translation?.keys) {
+              sliceNameDisplay = getTranslatedString(
+                sliceNameDisplay,
+                sliceParams.translation.keys.name,
+                'name',
+              );
+              descriptionDisplay = getTranslatedString(
+                descriptionDisplay,
+                sliceParams.translation.keys.description,
+                'description',
+              );
+            } else {
+              console.warn(`Translation not found in params: ${params}`);
+            }
+          }
+
+          return (
+            <FlexRowContainer>
+              <Link to={url} data-test={`${sliceName}-list-chart-title`}>
+                {certifiedBy && (
+                  <>
+                    <CertifiedBadge
+                      certifiedBy={certifiedBy}
+                      details={certificationDetails}
+                    />{' '}
+                  </>
+                )}
+                {sliceNameDisplay}
+              </Link>
+              {description && (
+                <InfoTooltip
+                  tooltip={descriptionDisplay}
+                  viewBox="0 -1 24 24"
+                />
               )}
-              {sliceName}
-            </Link>
-            {description && (
-              <InfoTooltip tooltip={description} viewBox="0 -1 24 24" />
-            )}
-          </FlexRowContainer>
-        ),
+            </FlexRowContainer>
+          );
+        },
         Header: t('Chart'),
         accessor: 'slice_name',
       },

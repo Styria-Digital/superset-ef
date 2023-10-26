@@ -25,6 +25,9 @@ interface UiConfigType {
   hideTab: boolean;
   hideNav: boolean;
   hideChartControls: boolean;
+  defaultLocale: string;
+  availableLanguages?: object;
+  currentLocale?: string;
 }
 interface EmbeddedUiConfigProviderProps {
   children: JSX.Element;
@@ -35,6 +38,7 @@ export const UiConfigContext = createContext<UiConfigType>({
   hideTab: false,
   hideNav: false,
   hideChartControls: false,
+  defaultLocale: 'en',
 });
 
 export const useUiConfig = () => useContext(UiConfigContext);

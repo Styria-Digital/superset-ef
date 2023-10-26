@@ -175,6 +175,7 @@ const AddSliceCard: React.FC<{
   style?: CSSProperties;
   thumbnailUrl?: string;
   visType: string;
+  sliceNameTranslated?: string;
 }> = ({
   datasourceUrl,
   datasourceName = '-',
@@ -185,6 +186,8 @@ const AddSliceCard: React.FC<{
   style = {},
   thumbnailUrl,
   visType,
+  sliceNameTranslated,
+
 }) => {
   const showThumbnails = isFeatureEnabled(FeatureFlag.THUMBNAILS);
   const [sliceAddedBadge, setSliceAddedBadge] = useState<HTMLDivElement>();
@@ -263,7 +266,11 @@ const AddSliceCard: React.FC<{
                 align-items: center;
               `}
             >
-              <TruncatedTextWithTooltip>{sliceName}</TruncatedTextWithTooltip>
+              <TruncatedTextWithTooltip>
+                {sliceNameTranslated
+                  ? `${sliceName} - (${sliceNameTranslated})`
+                  : sliceName}
+              </TruncatedTextWithTooltip>
               {isSelected && !showThumbnails ? (
                 <SliceAddedBadgePlaceholder
                   placeholderRef={setSliceAddedBadge}

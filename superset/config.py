@@ -354,6 +354,7 @@ LANGUAGES = {
     "es": {"flag": "es", "name": "Spanish"},
     "it": {"flag": "it", "name": "Italian"},
     "fr": {"flag": "fr", "name": "French"},
+    "hr": {"flag": "hr", "name": "Croatian"},
     "zh": {"flag": "cn", "name": "Chinese"},
     "ja": {"flag": "jp", "name": "Japanese"},
     "de": {"flag": "de", "name": "German"},
@@ -367,8 +368,19 @@ LANGUAGES = {
 }
 # Turning off i18n by default as translation in most languages are
 # incomplete and not well maintained.
-LANGUAGES = {}
+LANGUAGES = {
+    "en": {"flag": "us", "name": "English"},
+    "fr_CH": {"flag": "fr", "name": "French (Switzerland)"},
+    "de_CH": {"flag": "de", "name": "German (Switzerland)"},
+    "it_CH": {"flag": "it", "name": "Italian (Switzerland)"},
+}
 
+TRANSIFEX = {
+    "enabled": True,
+    "key_prefix": "bi.superset",
+    "token": "1/2477acc125008cc20d1cb4558f2c17acae2e0f73",
+    "secret": "1/c5aa6411e2dc05001c21c91453c3f79c2b5d3a8f",
+}
 
 # Override the default d3 locale format
 # Default values are equivalent to
@@ -1414,6 +1426,11 @@ CONTENT_SECURITY_POLICY_WARNING = True
 # Do you want Talisman enabled?
 TALISMAN_ENABLED = utils.cast_to_boolean(os.environ.get("TALISMAN_ENABLED", True))
 
+TRANSIFEX_SOURCES = [
+    "https://cds.svc.transifex.net",
+    "https://cds.static.transifex.net",
+]
+
 # If you want Talisman, how do you want it configured??
 TALISMAN_CONFIG = {
     "content_security_policy": {
@@ -1423,8 +1440,8 @@ TALISMAN_CONFIG = {
         "connect-src": [
             "'self'",
             "https://api.mapbox.com",
-            "https://events.mapbox.com",
-        ],
+            "https://events.mapbox.com"
+        ] + TRANSIFEX_SOURCES,
         "object-src": "'none'",
         "style-src": ["'self'", "'unsafe-inline'"],
         "script-src": ["'self'", "'strict-dynamic'"],
@@ -1442,7 +1459,7 @@ TALISMAN_DEV_CONFIG = {
             "'self'",
             "https://api.mapbox.com",
             "https://events.mapbox.com",
-        ],
+        ] + TRANSIFEX_SOURCES,
         "object-src": "'none'",
         "style-src": ["'self'", "'unsafe-inline'"],
         "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],

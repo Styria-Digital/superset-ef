@@ -6,6 +6,10 @@ EF version of Superset is by extended version that applies some additional featu
 
 ## Extension Changelog
 
+### 2023-10-26
+
+- Implementation of [Transifex](https://www.transifex.com) translations of field inputs. Available for Chart `title` and `description` fields. more info in [documentation](/RESOURCES/TRANSIFEX.md)
+
 ### 2023-09-26
 
 - Apply fix chart table for full table export (`csv/excel``) - https://github.com/apache/superset/pull/23554

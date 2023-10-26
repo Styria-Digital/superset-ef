@@ -17,6 +17,8 @@
  * under the License.
  */
 import UntypedJed from 'jed';
+import { tx, t as transifexTranslate } from '@transifex/native';
+
 import logging from '../utils/logging';
 import {
   Jed,
@@ -26,6 +28,7 @@ import {
   LocaleData,
   LanguagePack,
 } from './types';
+import { JsonObject } from '../connection';
 
 const DEFAULT_LANGUAGE_PACK: LanguagePack = {
   domain: 'superset',
@@ -45,10 +48,42 @@ export default class Translator {
 
   locale: Locale;
 
+  transifexLoaded: boolean;
+
+  transifexConfig?: JsonObject;
+
   constructor(config: TranslatorConfig = {}) {
-    const { languagePack = DEFAULT_LANGUAGE_PACK } = config;
+    let { languagePack = DEFAULT_LANGUAGE_PACK } = config;
+    const { transifex: transifexConfig } = config;
+
+    if (languagePack === null) {
+      languagePack = DEFAULT_LANGUAGE_PACK;
+      logging.warn(
+        '[Translations] no language pack found for selceted language, falling back to default one!',
+      );
+    }
+
     this.i18n = new UntypedJed(languagePack) as Jed;
     this.locale = this.i18n.options.locale_data.superset[''].lang as Locale;
+    this.transifexLoaded = false;
+    this.transifexConfig = transifexConfig;
+
+    if (this.transifexConfig?.enabled) {
+      tx.init({
+        token: this.transifexConfig.token,
+        secret: this.transifexConfig.secret,
+      });
+
+      tx.setCurrentLocale(this.locale)
+        .then(() => {
+          logging.info(
+            `[Transifex] Language ('${this.locale}') content loaded.`,
+          );
+
+          this.transifexLoaded = true;
+        })
+        .catch(error => logging.error(`[Transifex] ${error}`));
+    }
   }
 
   /**
@@ -86,7 +121,23 @@ export default class Translator {
   }
 
   translate(input: string, ...args: unknown[]): string {
-    return this.i18n.translate(input).fetch(...args);
+    let translated = input;
+
+    if (this.transifexLoaded) {
+      let transifexMeta = {};
+
+      if (args[0] && typeof args[0] === 'object') {
+        transifexMeta = args[0];
+      }
+
+      translated = transifexTranslate(input, transifexMeta);
+    }
+
+    if (this.transifexLoaded === false || input === translated) {
+      translated = this.i18n.translate(input).fetch(...args);
+    }
+
+    return translated;
   }
 
   translateWithNumber(key: string, ...args: unknown[]): string {

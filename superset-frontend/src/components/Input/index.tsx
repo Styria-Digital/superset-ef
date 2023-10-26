@@ -16,8 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { styled } from '@superset-ui/core';
+import React from 'react';
+
+import { styled, t, getTranslatorInstance } from '@superset-ui/core';
 import { Input as AntdInput, InputNumber as AntdInputNumber } from 'antd';
+
+import { T } from '@transifex/react';
+import { AntdForm } from 'src/components';
 
 export const Input = styled(AntdInput)`
   border: 1px solid ${({ theme }) => theme.colors.secondary.light3};
@@ -33,3 +38,90 @@ export const TextArea = styled(AntdInput.TextArea)`
   border: 1px solid ${({ theme }) => theme.colors.secondary.light3};
   border-radius: ${({ theme }) => theme.borderRadius}px;
 `;
+
+const StyledFormItem = styled(AntdForm.Item)`
+  margin-bottom: 0;
+`;
+
+const translationPreviewStyle = {
+  display: 'inline-block',
+  // eslint-disable-next-line theme-colors/no-literal-colors
+  backgroundColor: '#F0F0F0',
+  padding: '8px',
+  borderRadius: '4px',
+  textAlign: 'center',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  width: '100%',
+  minHeight: '38px',
+};
+
+interface Props {
+  fieldType: string;
+  name: string;
+  label: string;
+  translationPreviewKey: string;
+  rows?: number;
+  required?: boolean;
+  onChange?: Function;
+}
+
+const translatorInstance = getTranslatorInstance();
+
+export const TranslatableField = (props: Props) => {
+  const { fieldType, name, required, label, translationPreviewKey, onChange } =
+    props;
+  let { rows } = props;
+
+  rows = fieldType === 'textarea' ? rows || 4 : 0;
+
+  const FieldMap = {
+    input: Input,
+    textarea: TextArea,
+  };
+  const FieldComponent = FieldMap[fieldType];
+
+  const translationElements = (
+    <div className="translation_wrap">
+      <div style={{ padding: '8px 0px' }}>Translations</div>
+      <div
+        className="translation_fields_wrap"
+        style={{ display: 'flex', marginBottom: '1rem' }}
+      >
+        <StyledFormItem
+          label={t('Translation key prefix')}
+          name={`${name}_transifex_key_prefix`}
+          required
+        >
+          <Input
+            aria-label={t('Translation key prefix')}
+            name={`${name}_transifex_key_prefix`}
+            id={`${name}_transifex_key_prefix`}
+            type="text"
+          />
+        </StyledFormItem>
+      </div>
+      <div style={{ padding: '0 0 8px' }}>{t('Preview')}</div>
+      <div className="translation_preview" style={translationPreviewStyle}>
+        <T _key={translationPreviewKey} _str="" />
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <StyledFormItem label={label} name={name} required={required}>
+        <FieldComponent
+          rows={rows}
+          style={{ maxWidth: '100%' }}
+          name={name}
+          id={name}
+          required={required}
+          onChange={onChange}
+        />
+      </StyledFormItem>
+      {translatorInstance.transifexLoaded && translationElements}
+    </div>
+  );
+};

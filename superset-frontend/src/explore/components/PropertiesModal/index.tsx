@@ -18,7 +18,7 @@
  */
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import Modal from 'src/components/Modal';
-import { Input, TextArea } from 'src/components/Input';
+import { Input, TranslatableField } from 'src/components/Input';
 import Button from 'src/components/Button';
 import { AsyncSelect, Row, Col, AntdForm } from 'src/components';
 import { SelectValue } from 'antd/lib/select';
@@ -29,6 +29,10 @@ import {
   styled,
   isFeatureEnabled,
   FeatureFlag,
+  getTranslationKey,
+  getSliceParams,
+  getTranslatorInstance,
+  pushToTransifex,
 } from '@superset-ui/core';
 import Chart, { Slice } from 'src/types/Chart';
 import { getClientErrorObject } from 'src/utils/getClientErrorObject';
@@ -41,6 +45,9 @@ import {
   OBJECT_TYPES,
 } from 'src/features/tags/tags';
 import TagType from 'src/types/TagType';
+
+import { tx } from '@transifex/native';
+import { LanguagePicker, useLocale } from '@transifex/react';
 
 export type PropertiesModalProps = {
   slice: Slice;
@@ -61,6 +68,8 @@ const StyledFormItem = styled(AntdForm.Item)`
 const StyledHelpBlock = styled.span`
   margin-bottom: 0;
 `;
+
+const translatorInstance = getTranslatorInstance();
 
 function PropertiesModal({
   slice,
@@ -179,6 +188,19 @@ function PropertiesModal({
     });
   };
 
+  let translatableFieldNames: string[] = [];
+  const [currentLocale, setCurrentLocale] = useState(useLocale());
+  const sliceParams = getSliceParams(slice.params);
+
+  if (translatorInstance.transifexLoaded) {
+    translatableFieldNames = ['name', 'description'];
+  }
+
+  const onClose = () => {
+    if (translatorInstance.transifexLoaded) tx.setCurrentLocale(currentLocale);
+    onHide();
+  };
+
   const onSubmit = async (values: {
     certified_by?: string;
     certification_details?: string;
@@ -186,12 +208,14 @@ function PropertiesModal({
     cache_timeout?: number;
   }) => {
     setSubmitting(true);
+
     const {
       certified_by: certifiedBy,
       certification_details: certificationDetails,
       description,
       cache_timeout: cacheTimeout,
     } = values;
+
     const payload: { [key: string]: any } = {
       slice_name: name || null,
       description: description || null,
@@ -227,6 +251,22 @@ function PropertiesModal({
       }
     }
 
+    if (translatorInstance.transifexLoaded) {
+      const translationKeyParams: { [key: string]: any } = {};
+
+      translatableFieldNames.forEach(fieldName => {
+        translationKeyParams[fieldName] =
+          values[`${fieldName}_transifex_key_prefix`];
+      });
+
+      // eslint-disable-next-line dot-notation
+      sliceParams.translation = {
+        keys: translationKeyParams,
+      };
+    }
+
+    payload.params = JSON.stringify(sliceParams);
+
     try {
       const res = await SupersetClient.put({
         endpoint: `/api/v1/chart/${slice.slice_id}`,
@@ -242,8 +282,19 @@ function PropertiesModal({
         owners: selectedOwners,
       };
       onSave(updatedChart);
+
+      if (translatorInstance.transifexLoaded) {
+        pushToTransifex(
+          translatableFieldNames.map(fieldName => ({
+            name: fieldName,
+            value: values[fieldName],
+            prefix: values[`${fieldName}_transifex_key_prefix`],
+          })),
+        );
+      }
+
       addSuccessToast(t('Chart properties updated'));
-      onHide();
+      onClose();
     } catch (res) {
       const clientError = await getClientErrorObject(res);
       showError(clientError);
@@ -294,18 +345,50 @@ function PropertiesModal({
     setTags([]);
   };
 
+  const initialValues: { [key: string]: any } = {
+    name: slice.slice_name || '',
+    description: slice.description || '',
+    cache_timeout: slice.cache_timeout != null ? slice.cache_timeout : '',
+    certified_by: slice.certified_by || '',
+    certification_details:
+      slice.certified_by && slice.certification_details
+        ? slice.certification_details
+        : '',
+  };
+  const fullTranslationKeys: { [key: string]: any } = {};
+
+  if (translatorInstance.transifexLoaded) {
+    translatableFieldNames.forEach(fieldName => {
+      const translationKeyPrefix =
+        sliceParams.translation?.keys?.[fieldName] || `${slice.slice_id}`;
+
+      initialValues[`${fieldName}_transifex_key_prefix`] = translationKeyPrefix;
+      fullTranslationKeys[fieldName] = getTranslationKey(
+        translationKeyPrefix,
+        fieldName,
+      );
+    });
+  }
+
+  const translationSwitchElement = (
+    <div style={{ float: 'left' }}>
+      Translation preview: <LanguagePicker />
+    </div>
+  );
+
   return (
     <Modal
       show={show}
-      onHide={onHide}
+      onHide={onClose}
       title={t('Edit Chart Properties')}
       footer={
         <>
+          {translatorInstance.transifexLoaded && translationSwitchElement}
           <Button
             data-test="properties-modal-cancel-button"
             htmlType="button"
             buttonSize="small"
-            onClick={onHide}
+            onClick={onClose}
             cta
           >
             {t('Cancel')}
@@ -337,39 +420,33 @@ function PropertiesModal({
         form={form}
         onFinish={onSubmit}
         layout="vertical"
-        initialValues={{
-          name: slice.slice_name || '',
-          description: slice.description || '',
-          cache_timeout: slice.cache_timeout != null ? slice.cache_timeout : '',
-          certified_by: slice.certified_by || '',
-          certification_details:
-            slice.certified_by && slice.certification_details
-              ? slice.certification_details
-              : '',
-        }}
+        initialValues={initialValues}
       >
         <Row gutter={16}>
           <Col xs={24} md={12}>
             <h3>{t('Basic information')}</h3>
-            <FormItem label={t('Name')} required>
-              <Input
-                aria-label={t('Name')}
+            <FormItem>
+              <TranslatableField
+                fieldType="input"
+                label={t('Name')}
                 name="name"
-                data-test="properties-modal-name-input"
-                type="text"
-                value={name}
+                translationPreviewKey={fullTranslationKeys.name}
+                required
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                   setName(event.target.value ?? '')
                 }
               />
             </FormItem>
             <FormItem>
-              <StyledFormItem label={t('Description')} name="description">
-                <TextArea rows={3} style={{ maxWidth: '100%' }} />
-              </StyledFormItem>
+              <TranslatableField
+                fieldType="textarea"
+                label={t('Description')}
+                name="description"
+                translationPreviewKey={fullTranslationKeys.description}
+              />
               <StyledHelpBlock className="help-block">
                 {t(
-                  'The description can be displayed as widget headers in the dashboard view. Supports markdown.',
+                  'The description can be displayed as widget headers in the dashboard view.',
                 )}
               </StyledHelpBlock>
             </FormItem>

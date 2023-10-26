@@ -645,6 +645,7 @@ export const useChartEditModal = (
       certified_by: chart.certified_by,
       certification_details: chart.certification_details,
       is_managed_externally: chart.is_managed_externally,
+      params: chart.params,
     });
   }
 

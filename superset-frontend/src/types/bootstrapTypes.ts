@@ -93,6 +93,7 @@ export interface BrandProps {
 }
 
 export interface NavBarProps {
+  default_locale: string;
   show_watermark: boolean;
   bug_report_url?: string;
   bug_report_text?: string;
@@ -152,6 +153,7 @@ export interface CommonBootstrapData {
   theme_overrides: JsonObject;
   menu_data: MenuData;
   d3_format: Partial<FormatLocaleDefinition>;
+  transifex: JsonObject;
 }
 
 export interface BootstrapData {

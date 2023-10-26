@@ -57,6 +57,7 @@ export interface Chart {
     viz_type: string;
   };
   is_managed_externally: boolean;
+  params?: string;
 
   // TODO: Update API spec to describe `dashboards` key
   dashboards: ChartLinkedDashboard[];
@@ -74,6 +75,7 @@ export type Slice = {
   query_context?: object;
   is_managed_externally: boolean;
   owners?: number[];
+  params?: string;
 };
 
 export default Chart;

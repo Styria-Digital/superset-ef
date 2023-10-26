@@ -88,6 +88,7 @@ const parseResult = (result: any[]) =>
         thumbnail_url: slice.thumbnail_url,
         owners: slice.owners,
         created_by: slice.created_by,
+        params: slice.params,
       },
     };
   }, {});

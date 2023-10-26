@@ -19,6 +19,7 @@
 
 /* eslint no-console: 0 */
 
+import { tx } from '@transifex/native';
 import Translator from './Translator';
 import { TranslatorConfig, Translations, LocaleData } from './types';
 
@@ -71,6 +72,60 @@ function tn(key: string, ...args: unknown[]) {
   return getInstance().translateWithNumber(key, ...args);
 }
 
+/**
+ * Constructs translation key for string that is passed to transifex service.
+ * Uses `TRANSIFEX.key_prefix` as first part of key
+ */
+function getTranslationKey(prefix: string, fieldName: string) {
+  let baseKeyPrefix = '';
+
+  if (getInstance().transifexConfig?.key_prefix) {
+    baseKeyPrefix = getInstance().transifexConfig?.key_prefix;
+  }
+
+  return `${baseKeyPrefix}.${prefix}.${fieldName}`;
+}
+
+/**
+ * returns translation based on passed field prefix and field name along with
+ * original string from source.
+ */
+function getTranslatedString(
+  sourceString: string,
+  prefix: string,
+  fieldName: string,
+) {
+  return t(sourceString, { _key: getTranslationKey(prefix, fieldName) });
+}
+
+/**
+ * Shorthand to push list of field objects to Transifex API
+ */
+function pushToTransifex(
+  fields: {
+    name: string;
+    value: string;
+    prefix: string;
+  }[],
+) {
+  const translationData = {};
+
+  fields.forEach(field => {
+    const fieldKey = getTranslationKey(field.prefix, field.name);
+
+    translationData[fieldKey] = {
+      string: field.value,
+      meta: {
+        context: field.prefix,
+      },
+    };
+  });
+
+  tx.pushSource(translationData).then(() => {
+    console.info('[Transifex] Strings and keys sucessfully sent!');
+  });
+}
+
 export {
   configure,
   addTranslation,
@@ -79,4 +134,8 @@ export {
   t,
   tn,
   resetTranslation,
+  getInstance as getTranslatorInstance,
+  getTranslationKey,
+  getTranslatedString,
+  pushToTransifex,
 };

@@ -379,7 +379,8 @@ def menu_data(user: User) -> dict[str, Any]:
             if user.is_anonymous or is_feature_enabled("MENU_HIDE_USER_INFO")
             else "/profile/",
             "locale": session.get("locale", "en"),
-        },
+            "default_locale": appbuilder.app.config["BABEL_DEFAULT_LOCALE"],
+        }
     }
 
 
@@ -422,6 +423,7 @@ def cached_common_bootstrap_data(user: User, locale: str) -> dict[str, Any]:
         "extra_categorical_color_schemes": conf["EXTRA_CATEGORICAL_COLOR_SCHEMES"],
         "theme_overrides": conf["THEME_OVERRIDES"],
         "menu_data": menu_data(user),
+        "transifex": conf.get("TRANSIFEX", { "enabled": False })
     }
     bootstrap_data.update(conf["COMMON_BOOTSTRAP_OVERRIDES_FUNC"](bootstrap_data))
     return bootstrap_data

@@ -187,6 +187,7 @@ function ListViewCard({
 }: CardProps) {
   const Link = url && linkComponent ? linkComponent : AnchorLink;
   const theme = useTheme();
+
   return (
     <StyledCard
       data-test="styled-card"

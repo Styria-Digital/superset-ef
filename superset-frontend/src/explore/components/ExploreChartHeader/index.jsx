@@ -27,6 +27,10 @@ import {
   SupersetClient,
   t,
   tn,
+  getSliceParams,
+  getTranslationKey,
+  getTranslatedString,
+  getTranslatorInstance
 } from '@superset-ui/core';
 import { chartPropShape } from 'src/dashboard/util/propShapes';
 import AlteredSliceTag from 'src/components/AlteredSliceTag';
@@ -70,6 +74,8 @@ const additionalItemsStyles = theme => css`
     margin-right: ${theme.gridUnit * 3}px;
   }
 `;
+
+const translatorInstance = getTranslatorInstance();
 
 export const ExploreChartHeader = ({
   dashboardId,
@@ -162,6 +168,30 @@ export const ExploreChartHeader = ({
       metadata?.dashboards,
     );
 
+  const editableTitleProps = {
+    title: sliceName,
+    canEdit:
+      !slice ||
+      canOverwrite ||
+      (slice?.owners || []).includes(user?.userId),
+    onSave: actions.updateChartTitle,
+    placeholder: t('Add the name of the chart'),
+    label: t('Chart title'),
+  };
+    
+  let previewDescription = slice?.description;
+
+  if (slice && translatorInstance.transifexLoaded){
+    const sliceParams = getSliceParams(slice.params);
+
+    if (sliceParams.translation) {
+      editableTitleProps.translatedTitle = getTranslatedString(editableTitleProps.title, sliceParams.translation.keys.name, 'name');
+      previewDescription = getTranslatedString(slice.description, sliceParams.translation.keys.description, 'description');
+    } else {
+      console.warn(`Translation not found in params: ${slice.params}`)
+    }
+  }
+
   const metadataBar = useMemo(() => {
     if (!metadata) {
       return null;
@@ -199,26 +229,18 @@ export const ExploreChartHeader = ({
     if (slice?.description) {
       items.push({
         type: MetadataType.DESCRIPTION,
-        value: slice?.description,
+        value: previewDescription,
       });
     }
     return <MetadataBar items={items} tooltipPlacement="bottom" />;
-  }, [metadata, slice?.description]);
+  }, [metadata, slice?.description, previewDescription]);
 
   const oldSliceName = slice?.slice_name;
+
   return (
     <>
       <PageHeaderWithActions
-        editableTitleProps={{
-          title: sliceName,
-          canEdit:
-            !slice ||
-            canOverwrite ||
-            (slice?.owners || []).includes(user?.userId),
-          onSave: actions.updateChartTitle,
-          placeholder: t('Add the name of the chart'),
-          label: t('Chart title'),
-        }}
+        editableTitleProps={editableTitleProps}
         showTitlePanelItems={!!slice}
         certificatiedBadgeProps={{
           certifiedBy: slice?.certified_by,

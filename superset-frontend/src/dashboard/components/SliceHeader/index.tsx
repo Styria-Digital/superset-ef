@@ -24,7 +24,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { css, styled, t } from '@superset-ui/core';
+import {
+  css,
+  styled,
+  t,
+  getSliceParams,
+  getTranslatedString,
+  getTranslatorInstance,
+} from '@superset-ui/core';
 import { useUiConfig } from 'src/components/UiConfigContext';
 import { Tooltip } from 'src/components/Tooltip';
 import { useSelector } from 'react-redux';
@@ -127,6 +134,8 @@ const ChartHeaderStyles = styled.div`
   `}
 `;
 
+const translatorInstance = getTranslatorInstance();
+
 const SliceHeader: FC<SliceHeaderProps> = ({
   innerRef = null,
   forceRefresh = () => ({}),
@@ -192,13 +201,28 @@ const SliceHeader: FC<SliceHeaderProps> = ({
 
   const exploreUrl = `/explore/?dashboard_page_id=${dashboardPageId}&slice_id=${slice.slice_id}`;
 
+  let sliceNamePreview = sliceName;
+
+  if (translatorInstance.transifexLoaded) {
+    const sliceParams = getSliceParams(slice.params);
+    if (sliceParams.translation?.keys) {
+      sliceNamePreview = getTranslatedString(
+        sliceName,
+        sliceParams.translation.keys.name,
+        'name',
+      );
+    } else {
+      console.warn(`Translation not found in params: ${slice.params}`);
+    }
+  }
+
   return (
     <ChartHeaderStyles data-test="slice-header" ref={innerRef}>
       <div className="header-title" ref={headerRef}>
         <Tooltip title={headerTooltip}>
           <EditableTitle
             title={
-              sliceName ||
+              sliceNamePreview ||
               (editMode
                 ? '---' // this makes an empty title clickable
                 : '')
