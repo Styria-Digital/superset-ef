@@ -22,7 +22,7 @@ import PropTypes from 'prop-types';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import { createFilter } from 'react-search-input';
-import { t, styled, css, getSliceParams, getTranslatedString } from '@superset-ui/core';
+import { t, styled, css, getSliceParams, getTranslatedString, getTranslatorInstance } from '@superset-ui/core';
 import { Input } from 'src/components/Input';
 import { Select } from 'src/components';
 import Loading from 'src/components/Loading';
@@ -123,6 +123,8 @@ export const ChartList = styled.div`
   flex-grow: 1;
   min-height: 0;
 `;
+
+const translatorInstance = getTranslatorInstance();
 
 class SliceAdder extends React.Component {
   static sortByComparator(attr) {
@@ -256,14 +258,14 @@ class SliceAdder extends React.Component {
     const id = NEW_CHART_ID;
 
     let sliceNameTranslated;
-    // TODO: only if transifex active
-    const sliceParams = getSliceParams(cellData.params);
-    if (sliceParams.translation?.keys) {
-      sliceNameTranslated = getTranslatedString(cellData.slice_name, sliceParams.translation.keys.name, 'name');
-    } else {
-      console.warn(`Translation not found in params: ${sliceParams}`);
-    }
-    // end TODO
+    if (translatorInstance.transifexLoaded) {
+      const sliceParams = getSliceParams(cellData.params);
+      if (sliceParams.translation?.keys) {
+        sliceNameTranslated = getTranslatedString(cellData.slice_name, sliceParams.translation.keys.name, 'name');
+      } else {
+        console.warn(`Translation not found in params: ${sliceParams}`);
+      }
+    };
 
     const meta = {
       chartId: cellData.slice_id,
