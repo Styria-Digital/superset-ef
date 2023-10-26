@@ -29,7 +29,8 @@ import {
   tn,
   getSliceParams,
   getTranslationKey,
-  getTranslatedString
+  getTranslatedString,
+  getTranslatorInstance
 } from '@superset-ui/core';
 import { chartPropShape } from 'src/dashboard/util/propShapes';
 import AlteredSliceTag from 'src/components/AlteredSliceTag';
@@ -73,6 +74,8 @@ const additionalItemsStyles = theme => css`
     margin-right: ${theme.gridUnit * 3}px;
   }
 `;
+
+const translatorInstance = getTranslatorInstance();
 
 export const ExploreChartHeader = ({
   dashboardId,
@@ -176,10 +179,9 @@ export const ExploreChartHeader = ({
     label: t('Chart title'),
   };
     
-  // TODO: if translation enabled
-  let previewDescription;
+  let previewDescription = slice?.description;
 
-  if (slice){
+  if (slice && translatorInstance.transifexLoaded){
     const sliceParams = getSliceParams(slice.params);
 
     if (sliceParams.translation) {
@@ -189,7 +191,6 @@ export const ExploreChartHeader = ({
       console.warn(`Translation not found in params: ${slice.params}`)
     }
   }
-  // end TODO
 
   const metadataBar = useMemo(() => {
     if (!metadata) {
