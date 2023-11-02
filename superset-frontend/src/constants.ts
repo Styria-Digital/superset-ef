@@ -177,6 +177,7 @@ export const DEFAULT_COMMON_BOOTSTRAP_DATA: CommonBootstrapData = {
       user_logout_url: '',
       user_profile_url: '',
       locale: '',
+      default_locale: '',
     },
     settings: [],
     environment_tag: {
@@ -185,6 +186,12 @@ export const DEFAULT_COMMON_BOOTSTRAP_DATA: CommonBootstrapData = {
     },
   },
   d3_format: DEFAULT_D3_FORMAT,
+  transifex: {
+    enabled: false,
+    key_prefix: '',
+    token: '',
+    secret: '',
+  },
 };
 
 export const DEFAULT_BOOTSTRAP_DATA: BootstrapData = {

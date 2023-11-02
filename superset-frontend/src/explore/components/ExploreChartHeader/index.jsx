@@ -28,9 +28,8 @@ import {
   t,
   tn,
   getSliceParams,
-  getTranslationKey,
   getTranslatedString,
-  getTranslatorInstance
+  getTranslatorInstance,
 } from '@superset-ui/core';
 import { chartPropShape } from 'src/dashboard/util/propShapes';
 import AlteredSliceTag from 'src/components/AlteredSliceTag';
@@ -171,24 +170,30 @@ export const ExploreChartHeader = ({
   const editableTitleProps = {
     title: sliceName,
     canEdit:
-      !slice ||
-      canOverwrite ||
-      (slice?.owners || []).includes(user?.userId),
+      !slice || canOverwrite || (slice?.owners || []).includes(user?.userId),
     onSave: actions.updateChartTitle,
     placeholder: t('Add the name of the chart'),
     label: t('Chart title'),
   };
-    
+
   let previewDescription = slice?.description;
 
-  if (slice && translatorInstance.transifexLoaded){
+  if (slice && translatorInstance.transifexLoaded) {
     const sliceParams = getSliceParams(slice.params);
 
     if (sliceParams.translation) {
-      editableTitleProps.translatedTitle = getTranslatedString(editableTitleProps.title, sliceParams.translation.keys.name, 'name');
-      previewDescription = getTranslatedString(slice.description, sliceParams.translation.keys.description, 'description');
+      editableTitleProps.translatedTitle = getTranslatedString(
+        editableTitleProps.title,
+        sliceParams.translation.keys.name,
+        'name',
+      );
+      previewDescription = getTranslatedString(
+        slice.description,
+        sliceParams.translation.keys.description,
+        'description',
+      );
     } else {
-      console.warn(`Translation not found in params: ${slice.params}`)
+      console.warn(`Translation not found in params: ${slice.params}`);
     }
   }
 

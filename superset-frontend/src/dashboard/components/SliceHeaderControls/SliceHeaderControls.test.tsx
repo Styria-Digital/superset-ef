@@ -80,6 +80,7 @@ const createProps = (viz_type = 'sunburst') =>
       owners: [],
       modified: '<span class="no-wrap">22 hours ago</span>',
       changed_on: 1617143411523,
+      params: '{}',
     },
     isCached: [false],
     isExpanded: false,

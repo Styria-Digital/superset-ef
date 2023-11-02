@@ -187,7 +187,6 @@ const AddSliceCard: React.FC<{
   thumbnailUrl,
   visType,
   sliceNameTranslated,
-
 }) => {
   const showThumbnails = isFeatureEnabled(FeatureFlag.THUMBNAILS);
   const [sliceAddedBadge, setSliceAddedBadge] = useState<HTMLDivElement>();

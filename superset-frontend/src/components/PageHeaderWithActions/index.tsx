@@ -16,9 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import { SupersetTheme, css, t, useTheme } from '@superset-ui/core';
-import { ReactElement, ReactNode } from 'react';
 import { AntdDropdown, AntdDropdownProps } from 'src/components';
 import { TooltipPlacement } from 'src/components/Tooltip';
 import Button from '../Button';

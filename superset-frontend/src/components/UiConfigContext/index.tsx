@@ -25,7 +25,7 @@ interface UiConfigType {
   hideTab: boolean;
   hideNav: boolean;
   hideChartControls: boolean;
-  defaultLocale: string;
+  defaultLocale?: string;
   availableLanguages?: object;
   currentLocale?: string;
 }

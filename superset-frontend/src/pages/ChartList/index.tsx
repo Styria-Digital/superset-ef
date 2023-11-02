@@ -348,7 +348,6 @@ function ChartList(props: ChartListProps) {
             },
           },
         }: any) => {
-
           let sliceNameDisplay = sliceName;
           let descriptionDisplay = description;
 

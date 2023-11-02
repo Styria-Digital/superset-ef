@@ -189,7 +189,7 @@ function PropertiesModal({
   };
 
   let translatableFieldNames: string[] = [];
-  const [currentLocale, setCurrentLocale] = useState(useLocale());
+  const [currentLocale] = useState(useLocale());
   const sliceParams = getSliceParams(slice.params);
 
   if (translatorInstance.transifexLoaded) {

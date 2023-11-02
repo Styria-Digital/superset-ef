@@ -22,7 +22,14 @@ import PropTypes from 'prop-types';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import { createFilter } from 'react-search-input';
-import { t, styled, css, getSliceParams, getTranslatedString, getTranslatorInstance } from '@superset-ui/core';
+import {
+  t,
+  styled,
+  css,
+  getSliceParams,
+  getTranslatedString,
+  getTranslatorInstance,
+} from '@superset-ui/core';
 import { Input } from 'src/components/Input';
 import { Select } from 'src/components';
 import Loading from 'src/components/Loading';
@@ -261,15 +268,19 @@ class SliceAdder extends React.Component {
     if (translatorInstance.transifexLoaded) {
       const sliceParams = getSliceParams(cellData.params);
       if (sliceParams.translation?.keys) {
-        sliceNameTranslated = getTranslatedString(cellData.slice_name, sliceParams.translation.keys.name, 'name');
+        sliceNameTranslated = getTranslatedString(
+          cellData.slice_name,
+          sliceParams.translation.keys.name,
+          'name',
+        );
       } else {
         console.warn(`Translation not found in params: ${sliceParams}`);
       }
-    };
+    }
 
     const meta = {
       chartId: cellData.slice_id,
-      sliceName: cellData.slice_name
+      sliceName: cellData.slice_name,
     };
     return (
       <DragDroppable

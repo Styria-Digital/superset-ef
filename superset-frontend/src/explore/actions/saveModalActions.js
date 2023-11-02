@@ -170,37 +170,37 @@ const addToasts = (isNewSlice, sliceName, addedToDashboard) => {
 //  Update existing slice
 export const updateSlice =
   (slice, sliceName, dashboards, addedToDashboard) =>
-    async (dispatch, getState) => {
-      const { slice_id: sliceId, owners, form_data: formDataFromSlice } = slice;
-      const {
-        explore: {
-          form_data: { url_params: _, ...formData },
-        },
-      } = getState();
+  async (dispatch, getState) => {
+    const { slice_id: sliceId, owners, form_data: formDataFromSlice } = slice;
+    const {
+      explore: {
+        form_data: { url_params: _, ...formData },
+      },
+    } = getState();
 
-      const sliceParams = getSliceParams(slice.params);
-      if (sliceParams.translation) formData.translation = sliceParams.translation;
+    const sliceParams = getSliceParams(slice.params);
+    if (sliceParams.translation) formData.translation = sliceParams.translation;
 
-      try {
-        const response = await SupersetClient.put({
-          endpoint: `/api/v1/chart/${sliceId}`,
-          jsonPayload: getSlicePayload(
-            sliceName,
-            formData,
-            dashboards,
-            owners,
-            formDataFromSlice,
-          ),
-        });
+    try {
+      const response = await SupersetClient.put({
+        endpoint: `/api/v1/chart/${sliceId}`,
+        jsonPayload: getSlicePayload(
+          sliceName,
+          formData,
+          dashboards,
+          owners,
+          formDataFromSlice,
+        ),
+      });
 
-        dispatch(saveSliceSuccess());
-        addToasts(false, sliceName, addedToDashboard).map(dispatch);
-        return response.json;
-      } catch (error) {
-        dispatch(saveSliceFailed());
-        throw error;
-      }
-    };
+      dispatch(saveSliceSuccess());
+      addToasts(false, sliceName, addedToDashboard).map(dispatch);
+      return response.json;
+    } catch (error) {
+      dispatch(saveSliceFailed());
+      throw error;
+    }
+  };
 
 //  Create new slice
 export const createSlice =
@@ -210,9 +210,6 @@ export const createSlice =
         form_data: { url_params: _, ...formData },
       },
     } = getState();
-
-    const sliceParams = getSliceParams(slice.params);
-    if (sliceParams.translation) formData.translation = sliceParams.translation;
 
     try {
       const response = await SupersetClient.post({

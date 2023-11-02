@@ -208,6 +208,7 @@ const mockedProps = {
       version_string: '1.0.0',
       version_sha: 'randomSHA',
       build_number: 'randomBuildNumber',
+      default_locale: 'en',
     },
     settings: [
       {

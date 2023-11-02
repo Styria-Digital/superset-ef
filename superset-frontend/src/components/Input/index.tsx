@@ -43,7 +43,7 @@ const StyledFormItem = styled(AntdForm.Item)`
   margin-bottom: 0;
 `;
 
-const translationPreviewStyle = {
+const translationPreviewStyle: React.CSSProperties = {
   display: 'inline-block',
   // eslint-disable-next-line theme-colors/no-literal-colors
   backgroundColor: '#F0F0F0',
@@ -103,7 +103,7 @@ export const TranslatableField = (props: Props) => {
         </StyledFormItem>
       </div>
       <div style={{ padding: '0 0 8px' }}>{t('Preview')}</div>
-      <div className="translation_preview" style={translationPreviewStyle}>
+      <div style={translationPreviewStyle} className="translation_preview">
         <T _key={translationPreviewKey} _str="" />
       </div>
     </div>
